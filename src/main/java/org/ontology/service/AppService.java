@@ -1,11 +1,10 @@
-package org.example.service;
+package org.ontology.service;
 
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileManager;
 
-import javax.swing.*;
 import java.io.InputStream;
 import java.text.Collator;
 import java.util.ArrayList;

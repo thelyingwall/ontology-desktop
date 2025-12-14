@@ -1,7 +1,6 @@
-package org.example.ui;
+package org.ontology.ui;
 
-import org.apache.jena.query.*;
-import org.example.service.AppService;
+import org.ontology.service.AppService;
 
 import javax.swing.*;
 import java.awt.*;

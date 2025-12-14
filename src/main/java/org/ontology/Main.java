@@ -1,7 +1,7 @@
-package org.example;
+package org.ontology;
 
-import org.example.service.AppService;
-import org.example.ui.AppWindow;
+import org.ontology.service.AppService;
+import org.ontology.ui.AppWindow;
 
 import javax.swing.*;
 
