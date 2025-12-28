@@ -103,10 +103,34 @@ public class AppService {
                 instances.add(localName);
             }
         }
-        if (instances.isEmpty())
-            instances.add("Brak wyników dla klasy: " + selectedClass);
-
         return instances;
     }
+
+    public String getGpsCoordinatesOfInstance(String instanceName) {
+        String instanceUri = baseUri + "#" + instanceName;
+
+        //todo zmienic na uniwersalny prefix
+        String queryStr = prefixRDF + """
+        PREFIX CityOntoNavi: <http://www.semanticweb.org/lm/ontologies/2019/0/CityOntoNavi#>
+        SELECT ?gps
+        WHERE {
+            <%s> CityOntoNavi:location_gps_coordinates ?gps .
+        }
+        """.formatted(instanceUri);
+
+        Query query = QueryFactory.create(queryStr);
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+
+            if (results.hasNext()) {
+                QuerySolution sol = results.nextSolution();
+                return sol.getLiteral("gps").getString();
+            }
+        }
+
+        return null; // brak współrzędnych
+    }
+
 
 }

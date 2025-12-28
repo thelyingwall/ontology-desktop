@@ -3,10 +3,18 @@ package org.ontology.ui;
 import org.ontology.service.AppService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.table.TableColumn;
 
 public class AppWindow extends JFrame{
+
+    private JComboBox<String> comboBox;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private JLabel resultsInfoLabel;
+    private JButton loadButton;
 
     private final AppService appService;
 
@@ -26,6 +34,15 @@ public class AppWindow extends JFrame{
         JPanel root = new JPanel(new BorderLayout());
         root.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
+        root.add(createFormPanel(), BorderLayout.NORTH);
+        root.add(createResultsPanel(), BorderLayout.CENTER);
+
+        attachButtonListener();
+
+        setContentPane(root);
+    }
+
+    private JPanel createFormPanel() {
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -37,52 +54,99 @@ public class AppWindow extends JFrame{
         gbc.insets = new Insets(0, 0, 5, 0);
         form.add(comboLabel, gbc);
 
-        JComboBox<String> comboBox = new JComboBox<>();
-        comboBox.getAccessibleContext()
-                .setAccessibleName("Wybór klasy");
+        comboBox = new JComboBox<>();
+        comboBox.setModel(
+                new DefaultComboBoxModel<>(
+                        appService.getClasses().toArray(new String[0])
+                )
+        );
+        comboLabel.setLabelFor(comboBox);
+
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 12, 0);
         form.add(comboBox, gbc);
-        comboLabel.setLabelFor(comboBox);
-
-        comboBox.setModel(new DefaultComboBoxModel<>(appService.getClasses().toArray(new String[0])));
 
         JButton button = new JButton("Załaduj");
-        button.getAccessibleContext()
-                .setAccessibleName("Załaduj");
+        button.setName("loadButton");
+
         gbc.gridy = 2;
         gbc.weightx = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
         form.add(button, gbc);
 
-        root.add(form, BorderLayout.NORTH);
+        this.loadButton = button;
 
-        JTextArea resultsArea = new JTextArea();
-        resultsArea.setEditable(false);
-        resultsArea.setLineWrap(true);
-        resultsArea.setWrapStyleWord(true);
+        return form;
+    }
 
-        JScrollPane scrollPane = new JScrollPane(resultsArea);
-        scrollPane.setBorder(
+    private JPanel createResultsPanel() {
+        resultsInfoLabel = new JLabel();
+        resultsInfoLabel.setBorder(
+                BorderFactory.createEmptyBorder(4, 0, 4, 0)
+        );
+
+        tableModel = new DefaultTableModel(
+                new Object[]{"Lp.", "Rekord", "Akcja"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 2;
+            }
+        };
+
+        table = new JTable(tableModel);
+        configureTable(table);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        JPanel resultsPanel = new JPanel(new BorderLayout());
+        resultsPanel.setBorder(
                 BorderFactory.createTitledBorder("Wyniki")
         );
-        resultsArea.getAccessibleContext()
-                .setAccessibleName("Wyniki");
+        resultsPanel.add(resultsInfoLabel, BorderLayout.NORTH);
+        resultsPanel.add(scrollPane, BorderLayout.CENTER);
 
-        root.add(scrollPane, BorderLayout.CENTER);
+        return resultsPanel;
+    }
 
+    private void configureTable(JTable table) {
+        table.setRowHeight(25);
+        table.getTableHeader().setReorderingAllowed(false);
 
-        button.addActionListener(e -> {
-            String selectedClass = comboBox.getSelectedItem().toString();
-            List<String> instances = appService.getInstancesOfClass(selectedClass);
+        TableColumn lpCol = table.getColumnModel().getColumn(0);
+        lpCol.setMinWidth(30);
+        lpCol.setMaxWidth(30);
 
-            resultsArea.setText("");
-            for (String inst : instances) {
-                resultsArea.append(inst + "\n");
-            }
-        });
+        TableColumn akcjaCol = table.getColumnModel().getColumn(2);
+        akcjaCol.setMinWidth(100);
+        akcjaCol.setMaxWidth(100);
 
-        setContentPane(root);
+        akcjaCol.setCellRenderer(new ButtonRenderer());
+        akcjaCol.setCellEditor(new ButtonEditor(this, appService));
+    }
+
+    private void attachButtonListener() {
+        loadButton.addActionListener(e -> loadInstances());
+    }
+
+    private void loadInstances() {
+        String selectedClass = comboBox.getSelectedItem().toString();
+        List<String> instances = appService.getInstancesOfClass(selectedClass);
+
+        tableModel.setRowCount(0);
+
+        int count = instances.size();
+        resultsInfoLabel.setText(
+                count == 0
+                        ? "Brak wyników dla " + selectedClass
+                        : "Ilość znalezionych wyników dla "
+                        + selectedClass + ": " + count
+        );
+
+        int lp = 1;
+        for (String inst : instances) {
+            tableModel.addRow(new Object[]{lp++ + ".", inst, "Szczegóły"});
+        }
     }
 }
