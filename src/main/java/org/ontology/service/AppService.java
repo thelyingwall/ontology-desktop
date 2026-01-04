@@ -3,21 +3,26 @@ package org.ontology.service;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.RDF;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+
+import static org.ontology.service.PropertyKeys.NAMED_INDIVIDUAL;
+import static org.ontology.service.PropertyKeys.TYPE;
 
 public class AppService {
 
     private final Model model;
+    private String baseUri;
+    private String baseName;
+    private String prefixBase;
     private final String prefixRDF = "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
     private final String prefixOWL = "PREFIX owl:  <http://www.w3.org/2002/07/owl#>";
-    private String baseUri;
 
     public AppService(String ontologyPath) {
         model = ModelFactory.createDefaultModel();
@@ -69,6 +74,8 @@ public class AppService {
 
                 if (baseUri == null) {
                     baseUri = clsUri.substring(0, clsUri.indexOf('#'));
+                    baseName = baseUri.substring(baseUri.lastIndexOf('/') + 1);
+                    prefixBase = "PREFIX " + baseName + ": <" + baseUri + "#>";
                 }
             }
         }
@@ -109,14 +116,12 @@ public class AppService {
     public String getGpsCoordinatesOfInstance(String instanceName) {
         String instanceUri = baseUri + "#" + instanceName;
 
-        //todo zmienic na uniwersalny prefix
-        String queryStr = prefixRDF + """
-        PREFIX CityOntoNavi: <http://www.semanticweb.org/lm/ontologies/2019/0/CityOntoNavi#>
+        String queryStr = prefixRDF + prefixBase +"""
         SELECT ?gps
         WHERE {
-            <%s> CityOntoNavi:location_gps_coordinates ?gps .
+            <%s> %s:location_gps_coordinates ?gps .
         }
-        """.formatted(instanceUri);
+        """.formatted(instanceUri, baseName);
 
         Query query = QueryFactory.create(queryStr);
 
@@ -128,9 +133,79 @@ public class AppService {
                 return sol.getLiteral("gps").getString();
             }
         }
-
-        return null; // brak współrzędnych
+        return null;
     }
 
+    public Map<String, String> getPropertiesOfInstance(String instanceName) {
+
+        String queryStr = prefixRDF + prefixBase + """
+        SELECT ?property ?value
+        WHERE {
+            %s:%s ?property ?value .
+        }
+        """.formatted(baseName, instanceName);
+
+        Query query = QueryFactory.create(queryStr);
+        Map<String, String> result = new LinkedHashMap<>();
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+
+            while (results.hasNext()) {
+                QuerySolution sol = results.nextSolution();
+                String property = sol.get("property").toString();
+                property =  property.substring(property.lastIndexOf('#') + 1);
+                String value = sol.get("value").toString();
+                value = value.replace(baseUri + "#","");
+
+                if (!property.equals("type"))
+                    result.put(property, value);
+            }
+        }
+        return result;
+    }
+
+    public Boolean saveInstance(Map<String, String> properties) {
+        try {
+            String NS = baseUri + "#";
+
+            String instanceName = properties.get(NAMED_INDIVIDUAL);
+            Resource individual = model.createResource(NS + instanceName);
+
+            String typeName = properties.get(TYPE);
+            if (typeName != null) {
+                Resource typeResource = model.createResource(NS + typeName);
+                individual.addProperty(RDF.type, typeResource);
+            }
+
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+
+                if (key.equals(NAMED_INDIVIDUAL) || key.equals(TYPE)) continue;
+                individual.addProperty(model.createProperty(NS + key), value);
+            }
+
+            try (FileOutputStream out = new FileOutputStream("src/main/resources/ontology.rdf")) {
+                model.write(out, "RDF/XML-ABBREV");
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static String decapitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+
+        if (str.equals(str.toUpperCase())) {
+            return str.toLowerCase();
+        }
+
+        return Character.toLowerCase(str.charAt(0)) + str.substring(1);
+    }
 
 }

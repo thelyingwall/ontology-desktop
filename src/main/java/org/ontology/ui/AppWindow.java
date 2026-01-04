@@ -15,6 +15,7 @@ public class AppWindow extends JFrame{
     private DefaultTableModel tableModel;
     private JLabel resultsInfoLabel;
     private JButton loadButton;
+    private JButton addButton;
 
     private final AppService appService;
 
@@ -37,7 +38,8 @@ public class AppWindow extends JFrame{
         root.add(createFormPanel(), BorderLayout.NORTH);
         root.add(createResultsPanel(), BorderLayout.CENTER);
 
-        attachButtonListener();
+        attachLoadButtonListener();
+        attachAddButtonListener();
 
         setContentPane(root);
     }
@@ -66,16 +68,22 @@ public class AppWindow extends JFrame{
         gbc.insets = new Insets(0, 0, 12, 0);
         form.add(comboBox, gbc);
 
-        JButton button = new JButton("Załaduj");
-        button.setName("loadButton");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
 
+        JButton loadButton = new JButton("Załaduj");
+        JButton addButton = new JButton("Dodaj");
+
+        buttonPanel.add(loadButton);
+        buttonPanel.add(addButton);
+
+        gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.weightx = 0;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.EAST;
-        form.add(button, gbc);
+        form.add(buttonPanel, gbc);
 
-        this.loadButton = button;
+        this.loadButton = loadButton;
+        this.addButton = addButton;
 
         return form;
     }
@@ -126,8 +134,12 @@ public class AppWindow extends JFrame{
         akcjaCol.setCellEditor(new ButtonEditor(this, appService));
     }
 
-    private void attachButtonListener() {
+    private void attachLoadButtonListener() {
         loadButton.addActionListener(e -> loadInstances());
+    }
+
+    private void attachAddButtonListener() {
+        addButton.addActionListener(e -> addInstance());
     }
 
     private void loadInstances() {
@@ -147,6 +159,16 @@ public class AppWindow extends JFrame{
         int lp = 1;
         for (String inst : instances) {
             tableModel.addRow(new Object[]{lp++ + ".", inst, "Szczegóły"});
+        }
+    }
+
+    private void addInstance() {
+        String selectedClass = comboBox.getSelectedItem().toString();
+
+        DetailsDialog dialog = new DetailsDialog(this, appService, selectedClass);
+        dialog.setVisible(true);
+        if (dialog.isSaved()) {
+            loadInstances();
         }
     }
 }

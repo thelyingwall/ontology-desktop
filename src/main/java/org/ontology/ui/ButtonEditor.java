@@ -14,7 +14,7 @@ class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
     public ButtonEditor(JFrame owner, AppService appService) {
         button.addActionListener(e -> {
             fireEditingStopped();
-            DetailsDialog dialog = new DetailsDialog(owner, appService, rekord);
+            DetailsDialog dialog = new DetailsDialog(owner, appService, rekord, true);
             dialog.setVisible(true);
         });
     }
