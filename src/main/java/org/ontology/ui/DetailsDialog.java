@@ -50,11 +50,19 @@ public class DetailsDialog extends JDialog {
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.NONE;
             gbc.weightx = 0;
-            topPanel.add(new JLabel(property + ":"), gbc);
+            JLabel label = new JLabel(property + ":");
+            topPanel.add(label, gbc);
 
             JTextField field = new JTextField(30);
             field.setText(value != null ? value : "Brak danych");
             field.setEditable(false);
+
+            label.setLabelFor(field);
+
+            field.getAccessibleContext().setAccessibleName(property);
+            field.getAccessibleContext().setAccessibleDescription(
+                    "Wartość pola " + property
+            );
 
             gbc.gridx = 1;
             gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -76,7 +84,7 @@ public class DetailsDialog extends JDialog {
 
     public DetailsDialog(Frame owner, AppService appService, String className) {
         super(owner, "Nowa instancja", true);
-
+        boolean noLocalization = appService.noLocalization(className);
         Map<String, String> properties = new LinkedHashMap<>();
 
         setSize(600, 200);
@@ -91,6 +99,16 @@ public class DetailsDialog extends JDialog {
 
         JLabel recordLabel = new JLabel("Nowa instancja dla klasy " + className);
         recordLabel.setFont(recordLabel.getFont().deriveFont(Font.BOLD));
+
+        recordLabel.getAccessibleContext().setAccessibleName(
+                "Informacja"
+        );
+        recordLabel.getAccessibleContext().setAccessibleDescription(
+                "Nowa instancja dla klasy " + className
+        );
+
+        recordLabel.setFocusable(true);
+        recordLabel.requestFocusInWindow();
 
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -112,20 +130,44 @@ public class DetailsDialog extends JDialog {
         gbc.weightx = 1.0;
         topPanel.add(nameField, gbc);
 
-        JLabel localizationLabel = new JLabel(LOCATION_GPS_COORDINATES + ":");
-        gbc.gridy = 2;
+        JTextField latitudeField = new JTextField(10);
+        JTextField longitudeField = new JTextField(10);
+
+        if (!noLocalization) {
+            JLabel localizationLabel = new JLabel("Lokalizacja:");
+            gbc.gridy = 2;
+            gbc.gridx = 0;
+            gbc.gridwidth = 1;
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.weightx = 0;
+            topPanel.add(localizationLabel, gbc);
+
+            JPanel gpsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+
+            gpsPanel.add(new JLabel("szer. geo.:"));
+            gpsPanel.add(latitudeField);
+            gpsPanel.add(new JLabel("dł. geo.:"));
+            gpsPanel.add(longitudeField);
+
+            gbc.gridx = 1;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            topPanel.add(gpsPanel, gbc);
+        }
+
+        JLabel commentLabel = new JLabel(COMMENT + ":");
+        gbc.gridy = 3;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
-        topPanel.add(localizationLabel, gbc);
+        topPanel.add(commentLabel, gbc);
 
-        JTextField localizationField = new JTextField(30);
-//        localizationField.setText("55.555, 33.333");
+        JTextField commentField = new JTextField(30);
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
-        topPanel.add(localizationField, gbc);
+        topPanel.add(commentField, gbc);
 
         add(topPanel, BorderLayout.NORTH);
 
@@ -135,16 +177,19 @@ public class DetailsDialog extends JDialog {
         JButton saveButton = new JButton("Zapisz");
         saveButton.addActionListener(e -> {
             String name = nameField.getText().trim();
-            String gps = localizationField.getText().trim();
+            String latitude = latitudeField.getText().trim();
+            String longitude = longitudeField.getText().trim();
+            String comment = commentField.getText().trim();
 
             if (name.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Pole " + NAMED_INDIVIDUAL + " jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
                 nameField.requestFocus();
                 return;
             }
-            if (gps.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Pole " + LOCATION_GPS_COORDINATES + " jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
-                localizationField.requestFocus();
+            if (!noLocalization && (latitude.isEmpty() || longitude.isEmpty())) {
+                JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+                latitudeField.requestFocus();
+                longitudeField.requestFocus();
                 return;
             }
 
@@ -155,7 +200,10 @@ public class DetailsDialog extends JDialog {
             try {
                 properties.put(TYPE, className);
                 properties.put(NAMED_INDIVIDUAL, nameField.getText());
-                properties.put(LOCATION_GPS_COORDINATES, localizationField.getText());
+                if (!longitudeField.getText().isEmpty() && !latitudeField.getText().isEmpty())
+                    properties.put(LOCATION_GPS_COORDINATES, longitudeField.getText() + ", " + latitudeField.getText());
+                if (!commentField.getText().isEmpty())
+                    properties.put(COMMENT, commentField.getText());
                 success = appService.saveInstance(properties);
                 if (success) {
                     saved = true;

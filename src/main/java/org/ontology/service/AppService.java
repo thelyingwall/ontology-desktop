@@ -7,8 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.text.Collator;
 import java.util.*;
 
@@ -82,7 +81,6 @@ public class AppService {
         Collator collator = Collator.getInstance(new Locale("pl", "PL"));
         collator.setStrength(Collator.PRIMARY);
         Collections.sort(classNames, collator);
-
         return classNames;
     }
 
@@ -186,9 +184,9 @@ public class AppService {
                 individual.addProperty(model.createProperty(NS + key), value);
             }
 
-            try (FileOutputStream out = new FileOutputStream("src/main/resources/ontology.rdf")) {
-                model.write(out, "RDF/XML-ABBREV");
-            }
+//            try (FileOutputStream out = new FileOutputStream("src/main/resources/ontology.rdf")) {
+//                model.write(out, "RDF/XML-ABBREV");
+//            }
 
             return true;
 
@@ -206,6 +204,56 @@ public class AppService {
         }
 
         return Character.toLowerCase(str.charAt(0)) + str.substring(1);
+    }
+
+    public boolean saveFile(File file) {
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            model.write(out, "RDF/XML-ABBREV");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean loadFile(File file) {
+        try (FileInputStream in = new FileInputStream(file)) {
+            model.removeAll();
+            model.read(in, null);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean noLocalization(String selectedClass) {
+        List<String> abstractClasses = List.of(
+                Classes.Bike.toString(),
+                Classes.Bus.toString(),
+                Classes.Car.toString(),
+                Classes.ElementsOfCityArchitecture.toString(),
+                Classes.GPSCoordinates.toString(),
+                Classes.UserAvatar.toString(),
+                Classes.Motorcycle.toString(),
+                Classes.Vehicle.toString(),
+                Classes.Pavement.toString()
+        );
+        return abstractClasses.contains(selectedClass);
+    }
+
+    public boolean isAbstractClass(String selectedClass) {
+        List<String> abstractClasses = List.of(
+                Classes.Bike.toString(),
+                Classes.Bus.toString(),
+                Classes.Car.toString(),
+                Classes.ElementsOfCityArchitecture.toString(),
+                Classes.GPSCoordinates.toString(),
+                Classes.UserAvatar.toString(),
+                Classes.Motorcycle.toString(),
+                Classes.Vehicle.toString()
+        );
+        return abstractClasses.contains(selectedClass);
     }
 
 }

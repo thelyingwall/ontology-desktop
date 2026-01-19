@@ -5,6 +5,10 @@ import org.ontology.service.AppService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.List;
 import javax.swing.table.TableColumn;
 
@@ -42,6 +46,85 @@ public class AppWindow extends JFrame{
         attachAddButtonListener();
 
         setContentPane(root);
+
+        createMenuBar();
+
+        setupMenuShortcuts();
+    }
+
+    private void createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("Menu");
+
+        JMenuItem openItem = new JMenuItem("Wczytaj ontologię z pliku");
+        openItem.addActionListener(e -> {
+            JFileChooser chooser = new JFileChooser("src/main/resources");
+            int result = chooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = chooser.getSelectedFile();
+                boolean success = appService.loadFile(selectedFile);
+                System.out.println("Wybrano plik: " + selectedFile.getAbsolutePath());
+
+                if (success) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Ontologia " + selectedFile.getName() + " została wczytana poprawnie",
+                            "Sukces",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Błąd podczas wczytania ontologii " + selectedFile.getName(),
+                            "Błąd",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+
+        JMenuItem saveItem = new JMenuItem("Zapisz ontologię do pliku");
+        saveItem.addActionListener(e -> {
+
+            JFileChooser chooser = new JFileChooser("src/main/resources");
+            int result = chooser.showSaveDialog(this);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+
+                File selectedFile = chooser.getSelectedFile();
+                boolean success = appService.saveFile(selectedFile);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Ontologia " + selectedFile.getName() + " została zapisana poprawnie",
+                            "Sukces",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Błąd podczas zapisu ontologii " + selectedFile.getName(),
+                            "Błąd",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+
+        JMenuItem exitItem = new JMenuItem("Zamknij");
+        exitItem.addActionListener(e -> {
+            System.exit(0);
+        });
+
+        fileMenu.add(openItem);
+        fileMenu.add(saveItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitItem);
+
+        menuBar.add(fileMenu);
+        setJMenuBar(menuBar);
     }
 
     private JPanel createFormPanel() {
@@ -62,7 +145,12 @@ public class AppWindow extends JFrame{
                         appService.getClasses().toArray(new String[0])
                 )
         );
+        comboBox.setFocusable(true);
         comboLabel.setLabelFor(comboBox);
+        comboBox.getAccessibleContext().setAccessibleName("Wybierz klasę");
+        comboBox.getAccessibleContext().setAccessibleDescription(
+                "Lista rozwijana z wyborem klasy"
+        );
 
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 12, 0);
@@ -164,11 +252,48 @@ public class AppWindow extends JFrame{
 
     private void addInstance() {
         String selectedClass = comboBox.getSelectedItem().toString();
-
-        DetailsDialog dialog = new DetailsDialog(this, appService, selectedClass);
-        dialog.setVisible(true);
-        if (dialog.isSaved()) {
-            loadInstances();
+        boolean newInstancesDisabled = appService.isAbstractClass(selectedClass);
+        if (newInstancesDisabled) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Do klasy " + selectedClass + " nie można dodać indywiduum",
+                    "Błąd",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        } else {
+            DetailsDialog dialog = new DetailsDialog(this, appService, selectedClass);
+            dialog.setVisible(true);
+            if (dialog.isSaved()) {
+                loadInstances();
+            }
         }
     }
+
+    private void setupMenuShortcuts() {
+        JRootPane rootPane = getRootPane();
+
+        // Ctrl + \
+        KeyStroke openMenuKey = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, InputEvent.CTRL_DOWN_MASK);
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(openMenuKey, "openMenu");
+        rootPane.getActionMap().put("openMenu", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenu fileMenu = getJMenuBar().getMenu(0);
+                fileMenu.doClick();
+                fileMenu.getMenuComponent(0).requestFocusInWindow();
+            }
+        });
+
+        // Escape
+        KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKey, "selectClassList");
+        rootPane.getActionMap().put("selectClassList", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MenuSelectionManager.defaultManager().clearSelectedPath();
+                comboBox.requestFocusInWindow(); // zamień na Twój główny komponent
+            }
+        });
+    }
+
 }
