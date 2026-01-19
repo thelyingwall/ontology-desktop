@@ -3,6 +3,7 @@ package org.ontology.service;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
@@ -254,6 +255,18 @@ public class AppService {
                 Classes.Vehicle.toString()
         );
         return abstractClasses.contains(selectedClass);
+    }
+
+    public void deleteInstance(String instance) {
+        String uri = baseUri + "#" + instance;
+        Resource individual = model.getResource(uri);
+
+        if (model.containsResource(individual)) {
+            model.removeAll(individual, null, null);
+            model.removeAll(null, null, (RDFNode) individual);
+        } else {
+            System.out.println("Indywiduum nie istnieje w modelu: " + uri);
+        }
     }
 
 }

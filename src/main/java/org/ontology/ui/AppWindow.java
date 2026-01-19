@@ -215,11 +215,11 @@ public class AppWindow extends JFrame{
         lpCol.setMaxWidth(30);
 
         TableColumn akcjaCol = table.getColumnModel().getColumn(2);
-        akcjaCol.setMinWidth(100);
-        akcjaCol.setMaxWidth(100);
+        akcjaCol.setMinWidth(250);
+        akcjaCol.setMaxWidth(250);
 
         akcjaCol.setCellRenderer(new ButtonRenderer());
-        akcjaCol.setCellEditor(new ButtonEditor(this, appService));
+        akcjaCol.setCellEditor(new ButtonEditor(this, appService, table));
     }
 
     private void attachLoadButtonListener() {
@@ -230,7 +230,7 @@ public class AppWindow extends JFrame{
         addButton.addActionListener(e -> addInstance());
     }
 
-    private void loadInstances() {
+    public void loadInstances() {
         String selectedClass = comboBox.getSelectedItem().toString();
         List<String> instances = appService.getInstancesOfClass(selectedClass);
 
