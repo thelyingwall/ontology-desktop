@@ -1,9 +1,11 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
+import org.ontology.service.RelationType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,8 +19,16 @@ public class DetailsDialog extends JDialog {
         return saved;
     }
 
+
     public DetailsDialog(Frame owner, AppService appService, String rekord, Boolean isView) {
-        super(owner, "Szczegóły", true);
+        super(owner, isView ? "Szczegóły" : "Edycja", true);
+        if (isView)
+            this.details(owner, appService, rekord);
+        else this.edit(owner, appService, rekord);
+    }
+
+    //szczegoly
+    public void details(Frame owner, AppService appService, String rekord) {
         Map<String, String> properties = appService.getPropertiesOfInstance(rekord);
 
         setSize(600, 400);
@@ -59,10 +69,7 @@ public class DetailsDialog extends JDialog {
 
             label.setLabelFor(field);
 
-            field.getAccessibleContext().setAccessibleName(property);
-            field.getAccessibleContext().setAccessibleDescription(
-                    "Wartość pola " + property
-            );
+            Utils.setAccessible(field, property);
 
             gbc.gridx = 1;
             gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -82,6 +89,163 @@ public class DetailsDialog extends JDialog {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+//    edycja
+    public void edit(Frame owner, AppService appService, String rekord) {
+        Map<String, String> properties = appService.getPropertiesOfInstance(rekord);
+        Map<String, JTextField> fields = new LinkedHashMap<>();
+
+        setSize(600, 400);
+        setLocationRelativeTo(owner);
+        setLayout(new BorderLayout(10, 10));
+
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(4, 4, 4, 4);
+
+        JLabel recordLabel = new JLabel(rekord);
+        recordLabel.setFont(recordLabel.getFont().deriveFont(Font.BOLD));
+
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        topPanel.add(recordLabel, gbc);
+
+        int row = 1;
+
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+
+            String property = entry.getKey();
+            String value = entry.getValue();
+
+            gbc.gridx = 0;
+            gbc.gridy = row;
+            gbc.gridwidth = 1;
+            gbc.fill = GridBagConstraints.NONE;
+            gbc.weightx = 0;
+            JLabel label = new JLabel(property + ":");
+            topPanel.add(label, gbc);
+
+            JTextField field = new JTextField(30);
+            field.setText(value != null ? value : "Brak danych");
+            field.setEditable(true);
+
+            label.setLabelFor(field);
+
+            Utils.setAccessible(field, property);
+
+            fields.put(property, field);
+
+            gbc.gridx = 1;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            topPanel.add(field, gbc);
+
+            row++;
+        }
+
+        add(topPanel, BorderLayout.NORTH);
+
+        JButton cancelButton = new JButton("Anuluj");
+        cancelButton.addActionListener(e -> dispose());
+
+        JButton saveButton = new JButton("Zapisz");
+        saveButton.addActionListener(e -> {
+
+            Map<String, String> updatedValues = new LinkedHashMap<>();
+
+            for (Map.Entry<String, JTextField> entry : fields.entrySet()) {
+                String property = entry.getKey();
+                String value = entry.getValue().getText().trim();
+
+                updatedValues.put(property, value);
+            }
+
+            appService.updateInstance(rekord, updatedValues);
+            dispose();
+
+//            String name = nameField.getText().trim();
+//            String latitude = latitudeField.getText().replace(',', '.').trim();
+//            String longitude = longitudeField.getText().replace(',', '.').trim();
+//            String comment = commentField.getText().trim();
+//
+//            if (name.isEmpty()) {
+//                JOptionPane.showMessageDialog(this, "Pole " + NAMED_INDIVIDUAL + " jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+//                nameField.requestFocus();
+//                return;
+//            }
+//            if (!noLocalization) {
+//
+//                if (latitude.isEmpty() || longitude.isEmpty()) {
+//                    JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+//                    latitudeField.requestFocus();
+//                    longitudeField.requestFocus();
+//                    return;
+//                }
+//
+//                if (!appService.isValidLatitude(latitude)) {
+//                    JOptionPane.showMessageDialog(
+//                            this,
+//                            "Niepoprawna szerokość geograficzna.\n" +
+//                                    "Zakres: -90 do 90",
+//                            "Błąd",
+//                            JOptionPane.ERROR_MESSAGE
+//                    );
+//                    latitudeField.requestFocusInWindow();
+//                    return;
+//                }
+//
+//                if (!appService.isValidLongitude(longitude)) {
+//                    JOptionPane.showMessageDialog(
+//                            this,
+//                            "Niepoprawna długość geograficzna.\n" +
+//                                    "Zakres: -180 do 180",
+//                            "Błąd",
+//                            JOptionPane.ERROR_MESSAGE
+//                    );
+//                    longitudeField.requestFocusInWindow();
+//                    return;
+//                }
+//            }
+//
+//            boolean success = false;
+//            String message;
+//            int messageType;
+//
+//            try {
+//                properties.put(TYPE, className);
+//                properties.put(NAMED_INDIVIDUAL, nameField.getText());
+//                if (!longitudeField.getText().isEmpty() && !latitudeField.getText().isEmpty())
+//                    properties.put(LOCATION_GPS_COORDINATES, latitudeField.getText().replace(',', '.') + ", " + longitudeField.getText().replace(',', '.'));
+//                if (!commentField.getText().isEmpty())
+//                    properties.put(COMMENT, commentField.getText());
+//                success = appService.saveInstance(properties);
+//                if (success) {
+//                    saved = true;
+//                    message = "Sukces!";
+//                    messageType = JOptionPane.INFORMATION_MESSAGE;
+//                } else {
+//                    message = "Błąd";
+//                    messageType = JOptionPane.ERROR_MESSAGE;
+//                }
+//            } catch (Exception ex) {
+//                message = "Wystąpił błąd: " + ex.getMessage();
+//                messageType = JOptionPane.ERROR_MESSAGE;
+//            }
+
+//            JOptionPane.showMessageDialog(this, message, "Informacja", messageType);
+//
+//            if (success) dispose();
+        });
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        bottomPanel.add(saveButton);
+        bottomPanel.add(cancelButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    //nowe indywiduum
     public DetailsDialog(Frame owner, AppService appService, String className) {
         super(owner, "Nowa instancja", true);
         boolean noLocalization = appService.noLocalization(className);
@@ -100,15 +264,7 @@ public class DetailsDialog extends JDialog {
         JLabel recordLabel = new JLabel("Nowa instancja dla klasy " + className);
         recordLabel.setFont(recordLabel.getFont().deriveFont(Font.BOLD));
 
-        recordLabel.getAccessibleContext().setAccessibleName(
-                "Informacja"
-        );
-        recordLabel.getAccessibleContext().setAccessibleDescription(
-                "Nowa instancja dla klasy " + className
-        );
-
-        recordLabel.setFocusable(true);
-        recordLabel.requestFocusInWindow();
+        Utils.setAccessible(recordLabel, "Nowa instancja dla klasy " + className);
 
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -128,6 +284,7 @@ public class DetailsDialog extends JDialog {
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
+        Utils.setAccessible(nameField, NAMED_INDIVIDUAL);
         topPanel.add(nameField, gbc);
 
         JTextField latitudeField = new JTextField(10);
@@ -140,13 +297,16 @@ public class DetailsDialog extends JDialog {
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.NONE;
             gbc.weightx = 0;
+            Utils.setAccessible(localizationLabel, "Lokalizacja");
             topPanel.add(localizationLabel, gbc);
 
             JPanel gpsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
             gpsPanel.add(new JLabel("szer. geo.:"));
+            Utils.setAccessible(latitudeField, "szerokość geograficzna");
             gpsPanel.add(latitudeField);
             gpsPanel.add(new JLabel("dł. geo.:"));
+            Utils.setAccessible(longitudeField, "długość geograficzna");
             gpsPanel.add(longitudeField);
 
             gbc.gridx = 1;
@@ -167,6 +327,7 @@ public class DetailsDialog extends JDialog {
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
+        Utils.setAccessible(commentField, COMMENT);
         topPanel.add(commentField, gbc);
 
         add(topPanel, BorderLayout.NORTH);
@@ -177,8 +338,8 @@ public class DetailsDialog extends JDialog {
         JButton saveButton = new JButton("Zapisz");
         saveButton.addActionListener(e -> {
             String name = nameField.getText().trim();
-            String latitude = latitudeField.getText().trim();
-            String longitude = longitudeField.getText().trim();
+            String latitude = latitudeField.getText().replace(',', '.').trim();
+            String longitude = longitudeField.getText().replace(',', '.').trim();
             String comment = commentField.getText().trim();
 
             if (name.isEmpty()) {
@@ -186,11 +347,38 @@ public class DetailsDialog extends JDialog {
                 nameField.requestFocus();
                 return;
             }
-            if (!noLocalization && (latitude.isEmpty() || longitude.isEmpty())) {
-                JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
-                latitudeField.requestFocus();
-                longitudeField.requestFocus();
-                return;
+            if (!noLocalization) {
+
+                if (latitude.isEmpty() || longitude.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    latitudeField.requestFocus();
+                    longitudeField.requestFocus();
+                    return;
+                }
+
+                if (!appService.isValidLatitude(latitude)) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Niepoprawna szerokość geograficzna.\n" +
+                                    "Zakres: -90 do 90",
+                            "Błąd",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    latitudeField.requestFocusInWindow();
+                    return;
+                }
+
+                if (!appService.isValidLongitude(longitude)) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Niepoprawna długość geograficzna.\n" +
+                                    "Zakres: -180 do 180",
+                            "Błąd",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    longitudeField.requestFocusInWindow();
+                    return;
+                }
             }
 
             boolean success = false;
@@ -201,7 +389,7 @@ public class DetailsDialog extends JDialog {
                 properties.put(TYPE, className);
                 properties.put(NAMED_INDIVIDUAL, nameField.getText());
                 if (!longitudeField.getText().isEmpty() && !latitudeField.getText().isEmpty())
-                    properties.put(LOCATION_GPS_COORDINATES, longitudeField.getText() + ", " + latitudeField.getText());
+                    properties.put(LOCATION_GPS_COORDINATES, latitudeField.getText().replace(',', '.') + ", " + longitudeField.getText().replace(',', '.'));
                 if (!commentField.getText().isEmpty())
                     properties.put(COMMENT, commentField.getText());
                 success = appService.saveInstance(properties);
@@ -215,6 +403,125 @@ public class DetailsDialog extends JDialog {
                 }
             } catch (Exception ex) {
                 message = "Wystąpił błąd: " + ex.getMessage();
+                messageType = JOptionPane.ERROR_MESSAGE;
+            }
+
+            JOptionPane.showMessageDialog(this, message, "Informacja", messageType);
+
+            if (success) dispose();
+        });
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        bottomPanel.add(saveButton);
+        bottomPanel.add(cancelButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    //nowa relacja
+    public DetailsDialog(Frame owner, AppService appService) {
+        super(owner, "Nowa relacja", true);
+
+        setSize(600, 400);
+        setLocationRelativeTo(owner);
+        setLayout(new BorderLayout(10, 10));
+
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(4, 4, 4, 4);
+
+        JLabel recordLabel = new JLabel("Nowa relacja");
+        recordLabel.setFont(recordLabel.getFont().deriveFont(Font.BOLD));
+
+        Utils.setAccessible(recordLabel, "Nowa relacja");
+
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        topPanel.add(recordLabel, gbc);
+
+        int row = 1;
+
+// --- ComboBox 1 ---
+        JLabel label1 = new JLabel("Wybierz indywiduum:");
+        gbc.gridy = row++;
+        topPanel.add(label1, gbc);
+
+        JComboBox<String> combo1 = new JComboBox<>(appService.getAllInstances().toArray(new String[0]));
+        gbc.gridy = row++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        topPanel.add(combo1, gbc);
+
+        Utils.setAccessible(combo1, "Indywiduum 1");
+
+// --- ComboBox 2 ---
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+
+        JLabel label2 = new JLabel("Wybierz typ relacji:");
+        gbc.gridy = row++;
+        topPanel.add(label2, gbc);
+
+        JComboBox<String> combo2 = new JComboBox<>(
+                Arrays.stream(RelationType.values())
+                        .map(Enum::name)
+                        .toArray(String[]::new)
+        );
+        gbc.gridy = row++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        topPanel.add(combo2, gbc);
+
+        Utils.setAccessible(combo2, "Typ relacji");
+
+// --- ComboBox 3 ---
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+
+        JLabel label3 = new JLabel("Wybierz docelowe indywiduum:");
+        gbc.gridy = row++;
+        topPanel.add(label3, gbc);
+
+        JComboBox<String> combo3 = new JComboBox<>(appService.getAllInstances().toArray(new String[0]));
+        gbc.gridy = row++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        topPanel.add(combo3, gbc);
+
+        Utils.setAccessible(combo3, "Docelowe indywiduum");
+
+        add(topPanel, BorderLayout.NORTH);
+
+
+
+
+        JButton cancelButton = new JButton("Anuluj");
+        cancelButton.addActionListener(e -> dispose());
+
+        JButton saveButton = new JButton("Zapisz");
+        saveButton.addActionListener(e -> {
+            String selectedIndividual1 = (String) combo1.getSelectedItem();
+            String selectedRelationType = (String) combo2.getSelectedItem();
+            String selectedIndividual2 = (String) combo3.getSelectedItem();
+
+            if (selectedIndividual1.equals(selectedIndividual2)) {
+                JOptionPane.showMessageDialog(this, "Wybrano te same indywidua!", "Błąd", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            boolean success = false;
+            String message;
+            int messageType;
+
+            success = appService.addNewRelation(selectedIndividual1, selectedRelationType, selectedIndividual2);
+            if (success) {
+                saved = true;
+                message = "Sukces!";
+                messageType = JOptionPane.INFORMATION_MESSAGE;
+            } else {
+                message = "Błąd";
                 messageType = JOptionPane.ERROR_MESSAGE;
             }
 

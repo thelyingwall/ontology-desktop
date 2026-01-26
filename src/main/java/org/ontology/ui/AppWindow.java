@@ -113,6 +113,11 @@ public class AppWindow extends JFrame{
             }
         });
 
+        JMenuItem relationItem = new JMenuItem("Dodaj nową relację");
+        relationItem.addActionListener(e -> {
+            addRelation();
+        });
+
         JMenuItem exitItem = new JMenuItem("Zamknij");
         exitItem.addActionListener(e -> {
             System.exit(0);
@@ -120,6 +125,7 @@ public class AppWindow extends JFrame{
 
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
+        fileMenu.add(relationItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
@@ -183,17 +189,18 @@ public class AppWindow extends JFrame{
         );
 
         tableModel = new DefaultTableModel(
-                new Object[]{"Lp.", "Rekord", "Akcja"}, 0
+                new Object[]{"Lp.", "Nazwa", "Szczegóły", "Edytuj", "Usuń"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 2;
+                return column >= 2;
             }
         };
 
         table = new JTable(tableModel);
         configureTable(table);
 
+        Utils.setAccessible(table, "Tabela, nagłówki: Lp., Nazwa, Szczegóły, Edytuj, Usuń");
         JScrollPane scrollPane = new JScrollPane(table);
 
         JPanel resultsPanel = new JPanel(new BorderLayout());
@@ -214,12 +221,13 @@ public class AppWindow extends JFrame{
         lpCol.setMinWidth(30);
         lpCol.setMaxWidth(30);
 
-        TableColumn akcjaCol = table.getColumnModel().getColumn(2);
-        akcjaCol.setMinWidth(250);
-        akcjaCol.setMaxWidth(250);
-
-        akcjaCol.setCellRenderer(new ButtonRenderer());
-        akcjaCol.setCellEditor(new ButtonEditor(this, appService, table));
+        for (int i = 2; i <= 4; i++) {
+            TableColumn col = table.getColumnModel().getColumn(i);
+            col.setMinWidth(110);
+            col.setMaxWidth(110);
+            col.setCellRenderer(new SimpleButtonRenderer());
+            col.setCellEditor(new ActionButtonEditor(this, appService, table, i));
+        }
     }
 
     private void attachLoadButtonListener() {
@@ -243,10 +251,17 @@ public class AppWindow extends JFrame{
                         : "Ilość znalezionych wyników dla "
                         + selectedClass + ": " + count
         );
+        Utils.setAccessible(resultsInfoLabel, resultsInfoLabel.getText());
 
         int lp = 1;
         for (String inst : instances) {
-            tableModel.addRow(new Object[]{lp++ + ".", inst, "Szczegóły"});
+            tableModel.addRow(new Object[]{
+                    lp++ + ".",
+                    inst,
+                    "Szczegóły",
+                    "Edytuj",
+                    "Usuń"
+            });
         }
     }
 
@@ -267,6 +282,12 @@ public class AppWindow extends JFrame{
                 loadInstances();
             }
         }
+    }
+
+    private void addRelation() {
+        DetailsDialog dialog = new DetailsDialog(this, appService);
+        dialog.setVisible(true);
+
     }
 
     private void setupMenuShortcuts() {
@@ -291,7 +312,7 @@ public class AppWindow extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 MenuSelectionManager.defaultManager().clearSelectedPath();
-                comboBox.requestFocusInWindow(); // zamień na Twój główny komponent
+                comboBox.requestFocusInWindow();
             }
         });
     }

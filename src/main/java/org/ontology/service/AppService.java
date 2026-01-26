@@ -1,17 +1,18 @@
 package org.ontology.service;
 
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import java.io.*;
 import java.text.Collator;
 import java.util.*;
+import java.util.regex.Pattern;
 
+import static org.apache.jena.vocabulary.OWL2.NamedIndividual;
 import static org.ontology.service.PropertyKeys.NAMED_INDIVIDUAL;
 import static org.ontology.service.PropertyKeys.TYPE;
 
@@ -23,6 +24,7 @@ public class AppService {
     private String prefixBase;
     private final String prefixRDF = "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
     private final String prefixOWL = "PREFIX owl:  <http://www.w3.org/2002/07/owl#>";
+    private static final Pattern COORD_PATTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
     public AppService(String ontologyPath) {
         model = ModelFactory.createDefaultModel();
@@ -112,6 +114,46 @@ public class AppService {
         return instances;
     }
 
+    public List<String> getAllInstances() {
+        List<String> instances = new ArrayList<>();
+
+        // dodaj prefiksy do zapytania
+        String queryStr = """
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        SELECT ?instance
+        WHERE {
+            ?instance rdf:type owl:NamedIndividual .
+        }
+        ORDER BY ?instance
+        """;
+
+        Query query = QueryFactory.create(queryStr);
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+
+            while (results.hasNext()) {
+                QuerySolution sol = results.nextSolution();
+                Resource res = sol.getResource("instance");
+
+                String name;
+                if (res.isURIResource()) {
+                    String instanceUri = res.getURI();
+                    name = instanceUri.substring(instanceUri.lastIndexOf('#') + 1);
+                } else {
+                    name = res.getId().getLabelString();
+                }
+
+                instances.add(name);
+            }
+        }
+
+        return instances;
+    }
+
+
+
     public String getGpsCoordinatesOfInstance(String instanceName) {
         String instanceUri = baseUri + "#" + instanceName;
 
@@ -197,6 +239,44 @@ public class AppService {
         }
     }
 
+    public void updateInstance(String instanceName, Map<String, String> properties) {
+        String NS = baseUri + "#";
+
+        Resource instance = model.getResource(NS + instanceName);
+        if (!model.containsResource(instance)) {
+            instance = model.createResource(NS + instanceName);
+        }
+
+        String typeName = properties.get("type");
+        if (typeName != null && !typeName.isBlank()) {
+            Resource classResource = model.createResource(NS + typeName);
+            model.removeAll(instance, RDF.type, classResource);
+            instance.addProperty(RDF.type, classResource);
+        }
+
+        for (String key : properties.keySet()) {
+            if (key.equals("type")) continue;
+            Property prop = model.createProperty(NS + key);
+            model.removeAll(instance, prop, null);
+        }
+
+        for (Map.Entry<String, String> e : properties.entrySet()) {
+            String key = e.getKey();
+            if (key.equals("type")) continue;
+            String value = e.getValue();
+            if (value != null && !value.isBlank()) {
+                Property prop = model.createProperty(NS + key);
+                if (key.equals("comment")) {
+                    instance.addProperty(RDFS.comment, value);
+                } else {
+                    instance.addProperty(prop, value);
+                }
+            }
+        }
+        //todo poprawic
+    }
+
+
     public static String decapitalize(String str) {
         if (str == null || str.isEmpty()) return str;
 
@@ -266,6 +346,56 @@ public class AppService {
             model.removeAll(null, null, (RDFNode) individual);
         } else {
             System.out.println("Indywiduum nie istnieje w modelu: " + uri);
+        }
+        // todo dodac usuwanie relacji
+    }
+
+    public boolean isValidLatitude(String value) {
+        if (!COORD_PATTERN.matcher(value).matches()) {
+            return false;
+        }
+
+        double lat = Double.parseDouble(value);
+        return lat >= -90 && lat <= 90;
+    }
+
+    public boolean isValidLongitude(String value) {
+        if (!COORD_PATTERN.matcher(value).matches()) {
+            return false;
+        }
+
+        double lon = Double.parseDouble(value);
+        return lon >= -180 && lon <= 180;
+    }
+
+//    public boolean addNewRelation(String selectedIndividual1, String selectedRelationType, String selectedIndividual2) {
+//        return true;
+//    }
+
+    public boolean addNewRelation(String selectedIndividual1, String selectedRelationType, String selectedIndividual2) {
+        try {
+            String NS = baseUri + "#";
+
+            // Pobieramy lub tworzymy indywiduum1
+            Resource individual1 = model.containsResource(model.getResource(NS + selectedIndividual1))
+                    ? model.getResource(NS + selectedIndividual1)
+                    : model.createResource(NS + selectedIndividual1);
+
+            // Pobieramy lub tworzymy indywiduum2
+            Resource individual2 = model.containsResource(model.getResource(NS + selectedIndividual2))
+                    ? model.getResource(NS + selectedIndividual2)
+                    : model.createResource(NS + selectedIndividual2);
+
+            // Tworzymy property dla relacji (predicate)
+            Property relationProp = model.createProperty(NS + selectedRelationType);
+
+            // Dodajemy trójkę RDF: indywiduum1 --relacja--> indywiduum2
+            individual1.addProperty(relationProp, individual2);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
