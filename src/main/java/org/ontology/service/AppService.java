@@ -55,12 +55,12 @@ public class AppService {
 
     public List<String> getClasses() {
         String queryStr = prefixRDF + prefixOWL + """
-        SELECT ?class
-        WHERE {
-            ?class rdf:type owl:Class .
-        }
-        ORDER BY ?class
-        """;
+                SELECT ?class
+                WHERE {
+                    ?class rdf:type owl:Class .
+                }
+                ORDER BY ?class
+                """;
 
         Query query = QueryFactory.create(queryStr);
 
@@ -92,12 +92,12 @@ public class AppService {
         String classUri = baseUri + "#" + selectedClass;
 
         String queryStr = prefixRDF + """
-            SELECT ?instance
-            WHERE {
-                ?instance rdf:type <%s> .
-            }
-            ORDER BY ?instance
-            """.formatted(classUri);
+                SELECT ?instance
+                WHERE {
+                    ?instance rdf:type <%s> .
+                }
+                ORDER BY ?instance
+                """.formatted(classUri);
 
         Query query = QueryFactory.create(queryStr);
 
@@ -119,14 +119,14 @@ public class AppService {
 
         // dodaj prefiksy do zapytania
         String queryStr = """
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
-        SELECT ?instance
-        WHERE {
-            ?instance rdf:type owl:NamedIndividual .
-        }
-        ORDER BY ?instance
-        """;
+                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                PREFIX owl: <http://www.w3.org/2002/07/owl#>
+                SELECT ?instance
+                WHERE {
+                    ?instance rdf:type owl:NamedIndividual .
+                }
+                ORDER BY ?instance
+                """;
 
         Query query = QueryFactory.create(queryStr);
 
@@ -153,16 +153,15 @@ public class AppService {
     }
 
 
-
     public String getGpsCoordinatesOfInstance(String instanceName) {
         String instanceUri = baseUri + "#" + instanceName;
 
-        String queryStr = prefixRDF + prefixBase +"""
-        SELECT ?gps
-        WHERE {
-            <%s> %s:location_gps_coordinates ?gps .
-        }
-        """.formatted(instanceUri, baseName);
+        String queryStr = prefixRDF + prefixBase + """
+                SELECT ?gps
+                WHERE {
+                    <%s> %s:location_gps_coordinates ?gps .
+                }
+                """.formatted(instanceUri, baseName);
 
         Query query = QueryFactory.create(queryStr);
 
@@ -180,11 +179,11 @@ public class AppService {
     public Map<String, String> getPropertiesOfInstance(String instanceName) {
 
         String queryStr = prefixRDF + prefixBase + """
-        SELECT ?property ?value
-        WHERE {
-            %s:%s ?property ?value .
-        }
-        """.formatted(baseName, instanceName);
+                SELECT ?property ?value
+                WHERE {
+                    %s:%s ?property ?value .
+                }
+                """.formatted(baseName, instanceName);
 
         Query query = QueryFactory.create(queryStr);
         Map<String, String> result = new LinkedHashMap<>();
@@ -195,9 +194,9 @@ public class AppService {
             while (results.hasNext()) {
                 QuerySolution sol = results.nextSolution();
                 String property = sol.get("property").toString();
-                property =  property.substring(property.lastIndexOf('#') + 1);
+                property = property.substring(property.lastIndexOf('#') + 1);
                 String value = sol.get("value").toString();
-                value = value.replace(baseUri + "#","");
+                value = value.replace(baseUri + "#", "");
 
                 if (!property.equals("type"))
                     result.put(property, value);
@@ -399,4 +398,39 @@ public class AppService {
         }
     }
 
+    public List<String> findIndividualsByClassAndProperty(String selectedClass, String selectedProperty, String selectedValue) {
+        List<String> instances = new ArrayList<>();
+        String classUri = baseUri + "#" + selectedClass;
+        String propertyUri = baseUri + "#" + selectedProperty;
+
+        String queryStr = prefixRDF + """
+                SELECT ?instance
+                WHERE {
+                    ?instance rdf:type <%s> .
+                    ?instance <%s> ?value .
+                
+                    FILTER(
+                        CONTAINS(
+                            LCASE(STR(?value)),
+                            LCASE("%s")
+                        )
+                    )
+                }
+                ORDER BY ?instance
+                """.formatted(classUri, propertyUri, selectedValue);
+
+        Query query = QueryFactory.create(queryStr);
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+
+            while (results.hasNext()) {
+                QuerySolution sol = results.nextSolution();
+                String instanceUri = sol.getResource("instance").getURI();
+                String localName = instanceUri.substring(instanceUri.lastIndexOf('#') + 1);
+                instances.add(localName);
+            }
+        }
+        return instances;
+    }
 }

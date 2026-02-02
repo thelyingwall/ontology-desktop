@@ -118,6 +118,11 @@ public class AppWindow extends JFrame{
             addRelation();
         });
 
+        JMenuItem findItems = new JMenuItem("Szukaj");
+        findItems.addActionListener(e -> {
+            find();
+        });
+
         JMenuItem exitItem = new JMenuItem("Zamknij");
         exitItem.addActionListener(e -> {
             System.exit(0);
@@ -126,6 +131,7 @@ public class AppWindow extends JFrame{
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
         fileMenu.add(relationItem);
+        fileMenu.add(findItems);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
@@ -285,9 +291,13 @@ public class AppWindow extends JFrame{
     }
 
     private void addRelation() {
-        DetailsDialog dialog = new DetailsDialog(this, appService);
+        AddRelationDialog dialog = new AddRelationDialog(this, appService);
         dialog.setVisible(true);
+    }
 
+    private void find() {
+        FindDialog dialog = new FindDialog(this, appService);
+        dialog.setVisible(true);
     }
 
     private void setupMenuShortcuts() {
