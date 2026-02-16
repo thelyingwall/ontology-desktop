@@ -1,7 +1,7 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
-import org.ontology.service.RelationType;
+import org.ontology.enums.RelationType;
 
 import javax.swing.*;
 import java.awt.*;

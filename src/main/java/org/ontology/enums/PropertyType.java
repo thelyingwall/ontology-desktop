@@ -1,4 +1,4 @@
-package org.ontology.service;
+package org.ontology.enums;
 
 public enum PropertyType {
     type,

@@ -3,16 +3,18 @@ package org.ontology.service;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.util.FileManager;
-import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.ontology.enums.Classes;
+import org.ontology.models.IndividualsByRelations;
+import org.ontology.models.SearchedIndividualsRelations;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.apache.jena.vocabulary.OWL2.NamedIndividual;
 import static org.ontology.service.PropertyKeys.NAMED_INDIVIDUAL;
 import static org.ontology.service.PropertyKeys.TYPE;
 
@@ -433,4 +435,148 @@ public class AppService {
         }
         return instances;
     }
+
+    public SearchedIndividualsRelations findIndividualsByRelationSPARQL(String selectedIndividual, String selectedRelation) {
+        List<IndividualsByRelations> results = new ArrayList<>();
+        String individualUri = baseUri + "#" + selectedIndividual;
+        String relationUri = baseUri + "#" + selectedRelation;
+
+        String queryStr = prefixRDF + """
+            SELECT ?source ?target
+            WHERE {
+                {
+                    <%s> <%s> ?target .
+                    BIND(<%s> AS ?source)
+                }
+                UNION
+                {
+                    ?source <%s> <%s> .
+                    BIND(<%s> AS ?target)
+                }
+            }
+            ORDER BY ?source ?target
+            """.formatted(
+                individualUri, relationUri, individualUri,
+                relationUri, individualUri, individualUri
+        );
+        double durationMs = 0.0;
+        long startTime = System.nanoTime();
+        Query query = QueryFactory.create(queryStr);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet resultSet = qexec.execSelect();
+
+            while (resultSet.hasNext()) {
+                QuerySolution sol = resultSet.nextSolution();
+
+                String source = sol.getResource("source").getURI();
+                String target = sol.getResource("target").getURI();
+
+                String sourceName = source.substring(source.indexOf("#") + 1);
+                String targetName = target.substring(target.indexOf("#") + 1);
+
+                results.add(new IndividualsByRelations(
+                        sourceName,
+                        selectedRelation,
+                        targetName
+                ));
+            }
+        }
+        long endTime = System.nanoTime();
+        durationMs = (endTime - startTime) / 1_000_000.0;
+        return new SearchedIndividualsRelations(results, String.format("%.3f ms", durationMs));
+    }
+
+    public SearchedIndividualsRelations findIndividualsByRelation(
+            String selectedIndividual,
+            String selectedRelation) {
+
+        List<IndividualsByRelations> results = new ArrayList<>();
+
+        String individualUri = baseUri + "#" + selectedIndividual;
+        String relationUri = baseUri + "#" + selectedRelation;
+        double durationMs = 0.0;
+        long startTime = System.nanoTime();
+        Resource individual = model.getResource(individualUri);
+        Property relation = model.getProperty(relationUri);
+
+        //selectedIndividual --relation--> ?target
+        StmtIterator outgoing = model.listStatements(individual, relation, (RDFNode) null);
+
+        while (outgoing.hasNext()) {
+            Statement stmt = outgoing.nextStatement();
+            RDFNode object = stmt.getObject();
+
+            if (object.isResource()) {
+                Resource target = object.asResource();
+                String targetName = target.getLocalName();
+
+                results.add(new IndividualsByRelations(
+                        selectedIndividual,
+                        selectedRelation,
+                        targetName
+                ));
+            }
+        }
+
+        //?source --relation--> selectedIndividual
+        StmtIterator incoming = model.listStatements(null, relation, individual);
+
+        while (incoming.hasNext()) {
+            Statement stmt = incoming.nextStatement();
+            Resource source = stmt.getSubject();
+            String sourceName = source.getLocalName();
+
+            results.add(new IndividualsByRelations(
+                    sourceName,
+                    selectedRelation,
+                    selectedIndividual
+            ));
+        }
+
+        long endTime = System.nanoTime();
+        durationMs = (endTime - startTime) / 1_000_000.0;
+        return new SearchedIndividualsRelations(results, String.format("%.3f ms", durationMs));
+    }
+
+    public boolean exportCSV(List<IndividualsByRelations> results, File file) {
+        if (results == null || results.isEmpty()) {
+            return false;
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".csv")) {
+            file = new File(file.getAbsolutePath() + ".csv");
+        }
+
+        try (PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(
+                        new FileOutputStream(file),
+                        StandardCharsets.UTF_8))) {
+
+            writer.println("Source;Relation;Target");
+
+            for (IndividualsByRelations r : results) {
+                String source = escapeCsv(r.getSourceIndividual());
+                String relation = escapeCsv(r.getRelation());
+                String target = escapeCsv(r.getTargetIndividual());
+
+                writer.printf("%s;%s;%s%n", source, relation, target);
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String escapeCsv(String field) {
+        if (field == null) return "";
+        if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
+            field = field.replace("\"", "\"\"");
+            return "\"" + field + "\"";
+        }
+        return field;
+    }
+
 }

@@ -123,6 +123,11 @@ public class AppWindow extends JFrame{
             find();
         });
 
+        JMenuItem findRelationItems = new JMenuItem("Szukaj relacje indywiduów");
+        findRelationItems.addActionListener(e -> {
+            findRelations();
+        });
+
         JMenuItem exitItem = new JMenuItem("Zamknij");
         exitItem.addActionListener(e -> {
             System.exit(0);
@@ -132,6 +137,7 @@ public class AppWindow extends JFrame{
         fileMenu.add(saveItem);
         fileMenu.add(relationItem);
         fileMenu.add(findItems);
+        fileMenu.add(findRelationItems);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
@@ -297,6 +303,11 @@ public class AppWindow extends JFrame{
 
     private void find() {
         FindDialog dialog = new FindDialog(this, appService);
+        dialog.setVisible(true);
+    }
+
+    private void findRelations() {
+        FindDialog dialog = new FindDialog(this, appService, true);
         dialog.setVisible(true);
     }
 

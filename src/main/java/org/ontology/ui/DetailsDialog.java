@@ -1,11 +1,9 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
-import org.ontology.service.RelationType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
