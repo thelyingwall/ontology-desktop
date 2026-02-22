@@ -112,7 +112,7 @@ public class AddRelationDialog extends JDialog {
             success = appService.addNewRelation(selectedIndividual1, selectedRelationType, selectedIndividual2);
             if (success) {
                 saved = true;
-                message = "Sukces!";
+                message = "Sukces! Relacja została dodana do modelu ontologii w pamięci aplikacji. W celu trwałego zapisania zmian należy zapisać ontologię.";
                 messageType = JOptionPane.INFORMATION_MESSAGE;
             } else {
                 message = "Błąd";

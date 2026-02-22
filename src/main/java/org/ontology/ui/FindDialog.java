@@ -150,7 +150,7 @@ public class FindDialog extends JDialog {
         cancelButton.addActionListener(e -> dispose());
     }
 
-    public FindDialog(Frame owner, AppService appService, boolean searchRelations) {
+    public FindDialog(Frame owner, AppService appService, boolean searchRelations, boolean searchByClass) {
         super(owner, "Szukaj", true);
         setupMenuShortcuts();
         setSize(1000, 700);
@@ -168,17 +168,19 @@ public class FindDialog extends JDialog {
         int row = 0;
 
         // --- ComboBox 1 ---
-        JLabel label1 = new JLabel("Wybierz indywiduum:");
+        JLabel label1 = new JLabel(searchByClass ? "Wybierz klasę:" : "Wybierz indywiduum:");
         gbc.gridy = row++;
         topPanel.add(label1, gbc);
 
-        combo1 = new JComboBox<>(appService.getAllInstances().toArray(new String[0]));
+        combo1 = new JComboBox<>(
+            searchByClass ? appService.getClasses().toArray(new String[0])
+            : appService.getAllInstances().toArray(new String[0]));
         gbc.gridy = row++;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         topPanel.add(combo1, gbc);
 
-        Utils.setAccessible(combo1, "Indywiduum 1");
+        Utils.setAccessible(combo1, searchByClass ? "Klasa" : "Indywiduum");
 
         // --- ComboBox 2 ---
         gbc.fill = GridBagConstraints.NONE;
@@ -253,7 +255,8 @@ public class FindDialog extends JDialog {
             String selectedIndividual = (String) combo1.getSelectedItem();
             String selectedRelation = (String) combo2.getSelectedItem();
 
-            SearchedIndividualsRelations temp = appService.findIndividualsByRelationSPARQL(selectedIndividual, selectedRelation);
+            SearchedIndividualsRelations temp = searchByClass ? appService.findRelationsByClassSPARQL(selectedIndividual, selectedRelation)
+                : appService.findIndividualsByRelationSPARQL(selectedIndividual, selectedRelation);
             results = temp.getRelations();
 
             displayResults(results);
@@ -269,7 +272,8 @@ public class FindDialog extends JDialog {
             String selectedIndividual = (String) combo1.getSelectedItem();
             String selectedRelation = (String) combo2.getSelectedItem();
 
-            SearchedIndividualsRelations temp = appService.findIndividualsByRelation(selectedIndividual, selectedRelation);
+            SearchedIndividualsRelations temp = searchByClass ? appService.findRelationsByClass(selectedIndividual, selectedRelation)
+                : appService.findIndividualsByRelation(selectedIndividual, selectedRelation);
             results = temp.getRelations();
 
             displayResults(results);
@@ -289,18 +293,7 @@ public class FindDialog extends JDialog {
                 return;
             }
 
-            String fileName = combo1.getSelectedItem() + "_" + combo2.getSelectedItem();
-            if (fileName.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Podaj nazwę pliku.",
-                        "Eksport CSV",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            if (!fileName.toLowerCase().endsWith(".csv")) {
-                fileName += ".csv";
-            }
+            String fileName = "export.csv";
 
             File resourcesDir = new File("src/main/resources");
             if (!resourcesDir.exists()) {

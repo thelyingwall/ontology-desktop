@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.ontology.service.PropertyKeys.*;
+import static org.ontology.constants.PropertyKeys.*;
 
 public class DetailsDialog extends JDialog {
 
@@ -162,78 +162,6 @@ public class DetailsDialog extends JDialog {
             appService.updateInstance(rekord, updatedValues);
             dispose();
 
-//            String name = nameField.getText().trim();
-//            String latitude = latitudeField.getText().replace(',', '.').trim();
-//            String longitude = longitudeField.getText().replace(',', '.').trim();
-//            String comment = commentField.getText().trim();
-//
-//            if (name.isEmpty()) {
-//                JOptionPane.showMessageDialog(this, "Pole " + NAMED_INDIVIDUAL + " jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
-//                nameField.requestFocus();
-//                return;
-//            }
-//            if (!noLocalization) {
-//
-//                if (latitude.isEmpty() || longitude.isEmpty()) {
-//                    JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
-//                    latitudeField.requestFocus();
-//                    longitudeField.requestFocus();
-//                    return;
-//                }
-//
-//                if (!appService.isValidLatitude(latitude)) {
-//                    JOptionPane.showMessageDialog(
-//                            this,
-//                            "Niepoprawna szerokość geograficzna.\n" +
-//                                    "Zakres: -90 do 90",
-//                            "Błąd",
-//                            JOptionPane.ERROR_MESSAGE
-//                    );
-//                    latitudeField.requestFocusInWindow();
-//                    return;
-//                }
-//
-//                if (!appService.isValidLongitude(longitude)) {
-//                    JOptionPane.showMessageDialog(
-//                            this,
-//                            "Niepoprawna długość geograficzna.\n" +
-//                                    "Zakres: -180 do 180",
-//                            "Błąd",
-//                            JOptionPane.ERROR_MESSAGE
-//                    );
-//                    longitudeField.requestFocusInWindow();
-//                    return;
-//                }
-//            }
-//
-//            boolean success = false;
-//            String message;
-//            int messageType;
-//
-//            try {
-//                properties.put(TYPE, className);
-//                properties.put(NAMED_INDIVIDUAL, nameField.getText());
-//                if (!longitudeField.getText().isEmpty() && !latitudeField.getText().isEmpty())
-//                    properties.put(LOCATION_GPS_COORDINATES, latitudeField.getText().replace(',', '.') + ", " + longitudeField.getText().replace(',', '.'));
-//                if (!commentField.getText().isEmpty())
-//                    properties.put(COMMENT, commentField.getText());
-//                success = appService.saveInstance(properties);
-//                if (success) {
-//                    saved = true;
-//                    message = "Sukces!";
-//                    messageType = JOptionPane.INFORMATION_MESSAGE;
-//                } else {
-//                    message = "Błąd";
-//                    messageType = JOptionPane.ERROR_MESSAGE;
-//                }
-//            } catch (Exception ex) {
-//                message = "Wystąpił błąd: " + ex.getMessage();
-//                messageType = JOptionPane.ERROR_MESSAGE;
-//            }
-
-//            JOptionPane.showMessageDialog(this, message, "Informacja", messageType);
-//
-//            if (success) dispose();
         });
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -393,7 +321,7 @@ public class DetailsDialog extends JDialog {
                 success = appService.saveInstance(properties);
                 if (success) {
                     saved = true;
-                    message = "Sukces!";
+                    message = "Sukces! Indywiduum zostało dodane do modelu ontologii w pamięci aplikacji. W celu trwałego zapisania zmian należy zapisać ontologię.";
                     messageType = JOptionPane.INFORMATION_MESSAGE;
                 } else {
                     message = "Błąd";

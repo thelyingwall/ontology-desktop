@@ -1,4 +1,4 @@
-package org.ontology.service;
+package org.ontology.constants;
 
 public class PropertyKeys {
     public static final String TYPE = "type";

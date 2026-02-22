@@ -128,6 +128,11 @@ public class AppWindow extends JFrame{
             findRelations();
         });
 
+        JMenuItem findRelationItemsByClass = new JMenuItem("Szukaj relacje dla wybranej klasy");
+        findRelationItemsByClass.addActionListener(e -> {
+            findRelationsByClass();
+        });
+
         JMenuItem exitItem = new JMenuItem("Zamknij");
         exitItem.addActionListener(e -> {
             System.exit(0);
@@ -138,6 +143,7 @@ public class AppWindow extends JFrame{
         fileMenu.add(relationItem);
         fileMenu.add(findItems);
         fileMenu.add(findRelationItems);
+        fileMenu.add(findRelationItemsByClass);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
@@ -307,7 +313,12 @@ public class AppWindow extends JFrame{
     }
 
     private void findRelations() {
-        FindDialog dialog = new FindDialog(this, appService, true);
+        FindDialog dialog = new FindDialog(this, appService, true, false);
+        dialog.setVisible(true);
+    }
+
+    private void findRelationsByClass() {
+        FindDialog dialog = new FindDialog(this, appService, true, true);
         dialog.setVisible(true);
     }
 

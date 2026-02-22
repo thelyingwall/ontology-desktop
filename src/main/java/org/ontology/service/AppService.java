@@ -15,8 +15,8 @@ import java.text.Collator;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.ontology.service.PropertyKeys.NAMED_INDIVIDUAL;
-import static org.ontology.service.PropertyKeys.TYPE;
+import static org.ontology.constants.PropertyKeys.NAMED_INDIVIDUAL;
+import static org.ontology.constants.PropertyKeys.TYPE;
 
 public class AppService {
 
@@ -442,7 +442,7 @@ public class AppService {
         String relationUri = baseUri + "#" + selectedRelation;
 
         String queryStr = prefixRDF + """
-            SELECT ?source ?target
+            SELECT DISTINCT ?source ?target
             WHERE {
                 {
                     <%s> <%s> ?target .
@@ -510,11 +510,15 @@ public class AppService {
                 Resource target = object.asResource();
                 String targetName = target.getLocalName();
 
-                results.add(new IndividualsByRelations(
+                IndividualsByRelations relationObj = new IndividualsByRelations(
                         selectedIndividual,
                         selectedRelation,
                         targetName
-                ));
+                );
+
+                if (!results.contains(relationObj)) {
+                    results.add(relationObj);
+                }
             }
         }
 
@@ -526,16 +530,131 @@ public class AppService {
             Resource source = stmt.getSubject();
             String sourceName = source.getLocalName();
 
-            results.add(new IndividualsByRelations(
+            IndividualsByRelations relationObj = new IndividualsByRelations(
                     sourceName,
                     selectedRelation,
                     selectedIndividual
-            ));
+            );
+
+            if (!results.contains(relationObj)) {
+                results.add(relationObj);
+            }
         }
 
         long endTime = System.nanoTime();
         durationMs = (endTime - startTime) / 1_000_000.0;
         return new SearchedIndividualsRelations(results, String.format("%.3f ms", durationMs));
+    }
+
+    public SearchedIndividualsRelations findRelationsByClassSPARQL(
+            String selectedClass, String selectedRelation) {
+
+        List<IndividualsByRelations> results = new ArrayList<>();
+
+        String classUri = baseUri + "#" + selectedClass;
+        String relationUri = baseUri + "#" + selectedRelation;
+
+        String queryStr = prefixRDF + """
+        SELECT DISTINCT ?source ?target
+        WHERE {
+            {
+                ?source rdf:type <%s> .
+                ?source <%s> ?target .
+            }
+            UNION
+            {
+                ?target rdf:type <%s> .
+                ?source <%s> ?target .
+            }
+        }
+        ORDER BY ?source ?target
+        """.formatted(classUri, relationUri, classUri, relationUri);
+
+        long startTime = System.nanoTime();
+
+        Query query = QueryFactory.create(queryStr);
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet resultSet = qexec.execSelect();
+
+            while (resultSet.hasNext()) {
+                QuerySolution sol = resultSet.nextSolution();
+
+                String source = sol.getResource("source").getURI();
+                String target = sol.getResource("target").getURI();
+
+                String sourceName = source.substring(source.indexOf("#") + 1);
+                String targetName = target.substring(target.indexOf("#") + 1);
+
+                results.add(new IndividualsByRelations(
+                        sourceName,
+                        selectedRelation,
+                        targetName
+                ));
+            }
+        }
+
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+
+        return new SearchedIndividualsRelations(results,
+                String.format("%.3f ms", durationMs));
+    }
+
+    public SearchedIndividualsRelations findRelationsByClass(
+            String selectedClass, String selectedRelation) {
+
+        List<IndividualsByRelations> results = new ArrayList<>();
+        Set<String> uniqueTriples = new HashSet<>();
+
+        long startTime = System.nanoTime();
+
+        Resource classRes = model.getResource(baseUri + "#" + selectedClass);
+        Property relationProp = model.getProperty(baseUri + "#" + selectedRelation);
+
+        StmtIterator stmtIterator = model.listStatements(null, relationProp, (RDFNode) null);
+
+        while (stmtIterator.hasNext()) {
+            Statement stmt = stmtIterator.nextStatement();
+
+            Resource source = stmt.getSubject();
+            RDFNode objectNode = stmt.getObject();
+
+            if (!objectNode.isResource()) {
+                continue;
+            }
+
+            Resource target = objectNode.asResource();
+
+            boolean sourceMatches = model.contains(source, RDF.type, classRes);
+            boolean targetMatches = model.contains(target, RDF.type, classRes);
+
+            if (sourceMatches || targetMatches) {
+
+                String sourceName = source.getURI()
+                        .substring(source.getURI().indexOf("#") + 1);
+
+                String targetName = target.getURI()
+                        .substring(target.getURI().indexOf("#") + 1);
+
+                String tripleKey = sourceName + "|" + targetName;
+
+                if (uniqueTriples.add(tripleKey)) {
+                    results.add(new IndividualsByRelations(
+                            sourceName,
+                            selectedRelation,
+                            targetName
+                    ));
+                }
+            }
+        }
+
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+
+        return new SearchedIndividualsRelations(
+                results,
+                String.format("%.3f ms", durationMs)
+        );
     }
 
     public boolean exportCSV(List<IndividualsByRelations> results, File file) {
@@ -547,12 +666,17 @@ public class AppService {
             file = new File(file.getAbsolutePath() + ".csv");
         }
 
+        boolean fileExists = file.exists();
+        boolean isEmpty = !fileExists || file.length() == 0;
+
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(
-                        new FileOutputStream(file),
+                        new FileOutputStream(file, true),
                         StandardCharsets.UTF_8))) {
 
-            writer.println("Source;Relation;Target");
+            if (isEmpty) {
+                writer.println("Source;Relation;Target");
+            }
 
             for (IndividualsByRelations r : results) {
                 String source = escapeCsv(r.getSourceIndividual());
