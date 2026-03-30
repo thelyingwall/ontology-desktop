@@ -1,6 +1,7 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
+import org.ontology.service.I18n;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.table.TableColumn;
 
@@ -57,34 +59,34 @@ public class AppWindow extends JFrame{
 
         JMenu fileMenu = new JMenu("Menu");
 
-        JMenuItem openItem = new JMenuItem("Wczytaj ontologię z pliku");
+        JMenuItem openItem = new JMenuItem(I18n.t("menu.loadOntologyFromFile"));
         openItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser("src/main/resources");
             int result = chooser.showOpenDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = chooser.getSelectedFile();
                 boolean success = appService.loadFile(selectedFile);
-                System.out.println("Wybrano plik: " + selectedFile.getAbsolutePath());
+                System.out.println(MessageFormat.format(I18n.t("messageBox.file"),selectedFile.getAbsolutePath()));
 
                 if (success) {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Ontologia " + selectedFile.getName() + " została wczytana poprawnie",
-                            "Sukces",
+                            MessageFormat.format(I18n.t("messageBox.loadSuccess"), selectedFile.getName()),
+                            I18n.t("messageBox.success"),
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 } else {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Błąd podczas wczytania ontologii " + selectedFile.getName(),
-                            "Błąd",
+                            MessageFormat.format(I18n.t("messageBox.loadError"), selectedFile.getName()),
+                            I18n.t("messageBox.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
             }
         });
 
-        JMenuItem saveItem = new JMenuItem("Zapisz ontologię do pliku");
+        JMenuItem saveItem = new JMenuItem(I18n.t("menu.saveOntologyFromFile"));
         saveItem.addActionListener(e -> {
 
             JFileChooser chooser = new JFileChooser("src/main/resources");
@@ -99,41 +101,41 @@ public class AppWindow extends JFrame{
                     JOptionPane.showMessageDialog(
                             this,
                             "Ontologia " + selectedFile.getName() + " została zapisana poprawnie",
-                            "Sukces",
+                            I18n.t("messageBox.success"),
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 } else {
                     JOptionPane.showMessageDialog(
                             this,
                             "Błąd podczas zapisu ontologii " + selectedFile.getName(),
-                            "Błąd",
+                            I18n.t("messageBox.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
             }
         });
 
-        JMenuItem relationItem = new JMenuItem("Dodaj nową relację");
+        JMenuItem relationItem = new JMenuItem(I18n.t("menu.addNewRelation"));
         relationItem.addActionListener(e -> {
             addRelation();
         });
 
-        JMenuItem findItems = new JMenuItem("Szukaj");
+        JMenuItem findItems = new JMenuItem(I18n.t("menu.search"));
         findItems.addActionListener(e -> {
             find();
         });
 
-        JMenuItem findRelationItems = new JMenuItem("Szukaj relacje indywiduów");
+        JMenuItem findRelationItems = new JMenuItem(I18n.t("menu.searchIndividualsRelation"));
         findRelationItems.addActionListener(e -> {
             findRelations();
         });
 
-        JMenuItem findRelationItemsByClass = new JMenuItem("Szukaj relacje dla wybranej klasy");
+        JMenuItem findRelationItemsByClass = new JMenuItem(I18n.t("menu.searchClassesRelation"));
         findRelationItemsByClass.addActionListener(e -> {
             findRelationsByClass();
         });
 
-        JMenuItem exitItem = new JMenuItem("Zamknij");
+        JMenuItem exitItem = new JMenuItem(I18n.t("button.close"));
         exitItem.addActionListener(e -> {
             System.exit(0);
         });
@@ -182,8 +184,8 @@ public class AppWindow extends JFrame{
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
 
-        JButton loadButton = new JButton("Załaduj");
-        JButton addButton = new JButton("Dodaj");
+        JButton loadButton = new JButton(I18n.t("button.load"));
+        JButton addButton = new JButton(I18n.t("button.add"));
 
         buttonPanel.add(loadButton);
         buttonPanel.add(addButton);
@@ -223,7 +225,7 @@ public class AppWindow extends JFrame{
 
         JPanel resultsPanel = new JPanel(new BorderLayout());
         resultsPanel.setBorder(
-                BorderFactory.createTitledBorder("Wyniki")
+                BorderFactory.createTitledBorder(I18n.t("results.label"))
         );
         resultsPanel.add(resultsInfoLabel, BorderLayout.NORTH);
         resultsPanel.add(scrollPane, BorderLayout.CENTER);
@@ -276,9 +278,9 @@ public class AppWindow extends JFrame{
             tableModel.addRow(new Object[]{
                     lp++ + ".",
                     inst,
-                    "Szczegóły",
-                    "Edytuj",
-                    "Usuń"
+                    I18n.t("button.details"),
+                    I18n.t("button.edit"),
+                    I18n.t("button.delete")
             });
         }
     }
@@ -290,7 +292,7 @@ public class AppWindow extends JFrame{
             JOptionPane.showMessageDialog(
                     this,
                     "Do klasy " + selectedClass + " nie można dodać indywiduum",
-                    "Błąd",
+                    I18n.t("messageBox.error"),
                     JOptionPane.ERROR_MESSAGE
             );
         } else {
