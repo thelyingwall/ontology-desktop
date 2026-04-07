@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.table.TableColumn;
 
 public class AppWindow extends JFrame{
@@ -57,7 +58,7 @@ public class AppWindow extends JFrame{
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu fileMenu = new JMenu("Menu");
+        JMenu fileMenu = new JMenu(I18n.t("menu.label"));
 
         JMenuItem openItem = new JMenuItem(I18n.t("menu.loadOntologyFromFile"));
         openItem.addActionListener(e -> {
@@ -100,14 +101,14 @@ public class AppWindow extends JFrame{
                 if (success) {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Ontologia " + selectedFile.getName() + " została zapisana poprawnie",
+                            MessageFormat.format(I18n.t("messageBox.saveSuccess"), selectedFile.getName()),
                             I18n.t("messageBox.success"),
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 } else {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Błąd podczas zapisu ontologii " + selectedFile.getName(),
+                            MessageFormat.format(I18n.t("messageBox.saveError"), selectedFile.getName()),
                             I18n.t("messageBox.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
@@ -135,6 +136,23 @@ public class AppWindow extends JFrame{
             findRelationsByClass();
         });
 
+        JMenu languageSubMenu = new JMenu(I18n.t("menu.language"));
+
+        JMenuItem polishItem = new JMenuItem(I18n.t("menu.language.polish"));
+        polishItem.addActionListener(e -> {
+            I18n.setLocale(new Locale("pl"));
+            refreshUI();
+        });
+
+        JMenuItem englishItem = new JMenuItem(I18n.t("menu.language.english"));
+        englishItem.addActionListener(e -> {
+            I18n.setLocale(Locale.ENGLISH);
+            refreshUI();
+        });
+
+        languageSubMenu.add(polishItem);
+        languageSubMenu.add(englishItem);
+
         JMenuItem exitItem = new JMenuItem(I18n.t("button.close"));
         exitItem.addActionListener(e -> {
             System.exit(0);
@@ -146,6 +164,7 @@ public class AppWindow extends JFrame{
         fileMenu.add(findItems);
         fileMenu.add(findRelationItems);
         fileMenu.add(findRelationItemsByClass);
+        fileMenu.add(languageSubMenu);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
@@ -160,7 +179,7 @@ public class AppWindow extends JFrame{
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel comboLabel = new JLabel("Wybierz klasę:");
+        JLabel comboLabel = new JLabel(I18n.t("chooseClass"));
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 5, 0);
         form.add(comboLabel, gbc);
@@ -173,10 +192,8 @@ public class AppWindow extends JFrame{
         );
         comboBox.setFocusable(true);
         comboLabel.setLabelFor(comboBox);
-        comboBox.getAccessibleContext().setAccessibleName("Wybierz klasę");
-        comboBox.getAccessibleContext().setAccessibleDescription(
-                "Lista rozwijana z wyborem klasy"
-        );
+        comboBox.getAccessibleContext().setAccessibleName(I18n.t("chooseClass"));
+        comboBox.getAccessibleContext().setAccessibleDescription(I18n.t("classDropdown"));
 
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 12, 0);
@@ -209,7 +226,12 @@ public class AppWindow extends JFrame{
         );
 
         tableModel = new DefaultTableModel(
-                new Object[]{"Lp.", "Nazwa", "Szczegóły", "Edytuj", "Usuń"}, 0
+                new Object[]{
+                        I18n.t("results.lp"),
+                        I18n.t("results.name"),
+                        I18n.t("results.details"),
+                        I18n.t("results.edit"),
+                        I18n.t("results.delete")}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -220,7 +242,7 @@ public class AppWindow extends JFrame{
         table = new JTable(tableModel);
         configureTable(table);
 
-        Utils.setAccessible(table, "Tabela, nagłówki: Lp., Nazwa, Szczegóły, Edytuj, Usuń");
+        Utils.setAccessible(table, I18n.t("results.table.header"));
         JScrollPane scrollPane = new JScrollPane(table);
 
         JPanel resultsPanel = new JPanel(new BorderLayout());
@@ -267,9 +289,8 @@ public class AppWindow extends JFrame{
         int count = instances.size();
         resultsInfoLabel.setText(
                 count == 0
-                        ? "Brak wyników dla " + selectedClass
-                        : "Ilość znalezionych wyników dla "
-                        + selectedClass + ": " + count
+                        ? MessageFormat.format(I18n.t("results.empty"), selectedClass)
+                        : MessageFormat.format(I18n.t("results.count"), selectedClass, count)
         );
         Utils.setAccessible(resultsInfoLabel, resultsInfoLabel.getText());
 
@@ -291,7 +312,7 @@ public class AppWindow extends JFrame{
         if (newInstancesDisabled) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Do klasy " + selectedClass + " nie można dodać indywiduum",
+                    MessageFormat.format(I18n.t("messageBox.addIndividualError"), selectedClass),
                     I18n.t("messageBox.error"),
                     JOptionPane.ERROR_MESSAGE
             );
@@ -349,6 +370,18 @@ public class AppWindow extends JFrame{
                 comboBox.requestFocusInWindow();
             }
         });
+    }
+
+    private void refreshUI() {
+        getContentPane().removeAll();
+        getJMenuBar().removeAll();
+
+        createMenuBar();
+        initComponents();
+
+        SwingUtilities.updateComponentTreeUI(this);
+        revalidate();
+        repaint();
     }
 
 }

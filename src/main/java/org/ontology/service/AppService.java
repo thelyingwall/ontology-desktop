@@ -12,6 +12,7 @@ import org.ontology.models.SearchedIndividualsRelations;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.Collator;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ public class AppService {
 
         try (InputStream in = FileManager.get().open(ontologyPath)) {
             if (in == null) {
-                throw new IllegalArgumentException("Nie znaleziono pliku: " + ontologyPath);
+                throw new IllegalArgumentException(MessageFormat.format(I18n.t("messageBox.noFileFoundError"), ontologyPath));
             }
             model.read(in, null);
         } catch (Exception e) {
@@ -346,7 +347,7 @@ public class AppService {
             model.removeAll(individual, null, null);
             model.removeAll(null, null, (RDFNode) individual);
         } else {
-            System.out.println("Indywiduum nie istnieje w modelu: " + uri);
+            System.out.println(MessageFormat.format(I18n.t("messageBox.individualNotFoundError"), uri));
         }
         // todo dodac usuwanie relacji
     }
@@ -368,10 +369,6 @@ public class AppService {
         double lon = Double.parseDouble(value);
         return lon >= -180 && lon <= 180;
     }
-
-//    public boolean addNewRelation(String selectedIndividual1, String selectedRelationType, String selectedIndividual2) {
-//        return true;
-//    }
 
     public boolean addNewRelation(String selectedIndividual1, String selectedRelationType, String selectedIndividual2) {
         try {

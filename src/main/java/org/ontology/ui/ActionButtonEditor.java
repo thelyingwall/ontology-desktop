@@ -1,10 +1,12 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
+import org.ontology.service.I18n;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
+import java.text.MessageFormat;
 
 class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
 
@@ -45,8 +47,8 @@ class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
                 case 4 -> { // usuń
                     int confirm = JOptionPane.showConfirmDialog(
                             owner,
-                            "Czy na pewno usunąć \"" + rekord + "\"?",
-                            "Potwierdzenie",
+                            MessageFormat.format(I18n.t("messageBox.confirmDeleteQuestion"), rekord),
+                            I18n.t("messageBox.confirmation"),
                             JOptionPane.YES_NO_OPTION
                     );
                     if (confirm == JOptionPane.YES_OPTION) {

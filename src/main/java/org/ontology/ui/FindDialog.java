@@ -5,6 +5,7 @@ import org.ontology.models.SearchedIndividualsRelations;
 import org.ontology.service.AppService;
 import org.ontology.enums.PropertyType;
 import org.ontology.enums.RelationType;
+import org.ontology.service.I18n;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +28,7 @@ public class FindDialog extends JDialog {
     private JLabel executionTimeLabel;
 
     public FindDialog(Frame owner, AppService appService) {
-        super(owner, "Szukaj", true);
+        super(owner, I18n.t("menu.search"), true);
         setupMenuShortcuts();
         setSize(600, 450);
         setLocationRelativeTo(owner);
@@ -43,7 +45,7 @@ public class FindDialog extends JDialog {
         int row = 0;
 
 
-        JLabel label1 = new JLabel("Wybierz klasę:");
+        JLabel label1 = new JLabel(I18n.t("chooseClass"));
         gbc.gridy = row++;
         topPanel.add(label1, gbc);
 
@@ -56,7 +58,7 @@ public class FindDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
 
-        JLabel label2 = new JLabel("Wybierz właściwość:");
+        JLabel label2 = new JLabel(I18n.t("chooseProperty"));
         gbc.gridy = row++;
         topPanel.add(label2, gbc);
 
@@ -75,7 +77,7 @@ public class FindDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
 
-        JLabel label3 = new JLabel("Wartość:");
+        JLabel label3 = new JLabel(I18n.t("chooseValue"));
         gbc.gridy = row++;
         topPanel.add(label3, gbc);
 
@@ -87,15 +89,18 @@ public class FindDialog extends JDialog {
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton searchButton = new JButton("Szukaj");
-        JButton cancelButton = new JButton("Anuluj");
+        JButton searchButton = new JButton(I18n.t("button.search"));
+        JButton cancelButton = new JButton(I18n.t("button.cancel"));
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         searchPanel.add(searchButton);
         searchPanel.add(cancelButton);
 
         tableModel = new DefaultTableModel(
-                new Object[]{"Lp.", "Wyniki"}, 0) {
+                new Object[]{
+                        I18n.t("results.lp"),
+                        I18n.t("results.label"),
+                        }, 0) {
                     @Override
                     public boolean isCellEditable(int row, int column) {
                         return false;
@@ -105,7 +110,7 @@ public class FindDialog extends JDialog {
         resultTable = new JTable(tableModel);
         configureTable(resultTable);
 
-        Utils.setAccessible(resultTable, "Tabela, nagłówki: Lp., Nazwa");
+        Utils.setAccessible(resultTable, I18n.t("results.table.header2"));
 
         resultTable.setFillsViewportHeight(true);
 
@@ -133,8 +138,8 @@ public class FindDialog extends JDialog {
             if (results == null || results.isEmpty()) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Nie znaleziono wyników.",
-                        "Brak wyników",
+                        I18n.t("results.noResultsFound"),
+                        I18n.t("results.noResults"),
                         JOptionPane.INFORMATION_MESSAGE
                 );
                 return;
@@ -151,7 +156,7 @@ public class FindDialog extends JDialog {
     }
 
     public FindDialog(Frame owner, AppService appService, boolean searchRelations, boolean searchByClass) {
-        super(owner, "Szukaj", true);
+        super(owner, I18n.t("menu.search"), true);
         setupMenuShortcuts();
         setSize(1000, 700);
         setLocationRelativeTo(owner);
@@ -168,7 +173,8 @@ public class FindDialog extends JDialog {
         int row = 0;
 
         // --- ComboBox 1 ---
-        JLabel label1 = new JLabel(searchByClass ? "Wybierz klasę:" : "Wybierz indywiduum:");
+        JLabel label1 = new JLabel(searchByClass ?
+                I18n.t("chooseClass") : I18n.t("chooseIndividual"));
         gbc.gridy = row++;
         topPanel.add(label1, gbc);
 
@@ -180,13 +186,13 @@ public class FindDialog extends JDialog {
         gbc.weightx = 1.0;
         topPanel.add(combo1, gbc);
 
-        Utils.setAccessible(combo1, searchByClass ? "Klasa" : "Indywiduum");
+        Utils.setAccessible(combo1, searchByClass ? I18n.t("chooseClass") : I18n.t("individual"));
 
         // --- ComboBox 2 ---
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
 
-        JLabel label2 = new JLabel("Wybierz typ relacji:");
+        JLabel label2 = new JLabel(I18n.t("chooseRelationType"));
         gbc.gridy = row++;
         topPanel.add(label2, gbc);
 
@@ -200,14 +206,14 @@ public class FindDialog extends JDialog {
         gbc.weightx = 1.0;
         topPanel.add(combo2, gbc);
 
-        Utils.setAccessible(combo2, "Typ relacji");
+        Utils.setAccessible(combo2, I18n.t("relationType"));
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton searchButtonSPARQL = new JButton("Szukaj SPARQL");
-        JButton searchButton = new JButton("Szukaj API JENA");
-        JButton exportButton = new JButton("Eksport do CSV");
-        JButton cancelButton = new JButton("Anuluj");
+        JButton searchButtonSPARQL = new JButton(I18n.t("button.searchSPARQL"));
+        JButton searchButton = new JButton(I18n.t("button.searchJENA"));
+        JButton exportButton = new JButton(I18n.t("button.exportToCSV"));
+        JButton cancelButton = new JButton(I18n.t("button.cancel"));
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         searchPanel.add(searchButtonSPARQL);
@@ -216,7 +222,11 @@ public class FindDialog extends JDialog {
         searchPanel.add(cancelButton);
 
         tableModel = new DefaultTableModel(
-                new Object[]{"Lp.", "Indywiduum źródłowe", "Nazwa relacji", "Połączone indywiduum"}, 0) {
+                new Object[]{
+                        I18n.t("results.lp"),
+                        I18n.t("sourceIndividual"),
+                        I18n.t("relationName"),
+                        I18n.t("matchedIndividual")}, 0) {
                     @Override
                     public boolean isCellEditable(int row, int column) {
                         return false;
@@ -226,7 +236,7 @@ public class FindDialog extends JDialog {
         resultTable = new JTable(tableModel);
         configureTable(resultTable, true);
 
-        Utils.setAccessible(resultTable, "Tabela, nagłówki: Lp., Indywiduum źródłowe, Nazwa relacji, Połączone indywiduum");
+        Utils.setAccessible(resultTable, I18n.t("results.table.header3"));
 
         resultTable.setFillsViewportHeight(true);
 
@@ -260,10 +270,12 @@ public class FindDialog extends JDialog {
             results = temp.getRelations();
 
             displayResults(results);
-            executionTimeLabel.setText("Wyniki: %d, Czas: %s".formatted(
-                    temp.getRelations().size(),
-                    temp.getTime()
-            ));
+            executionTimeLabel.setText(
+                    MessageFormat.format(
+                        I18n.t("results.numAndTime"),
+                        temp.getRelations().size(),
+                        temp.getTime()
+                ));
             Utils.setAccessible(executionTimeLabel, executionTimeLabel.getText());
         });
 
@@ -277,18 +289,20 @@ public class FindDialog extends JDialog {
             results = temp.getRelations();
 
             displayResults(results);
-            executionTimeLabel.setText("Wyniki: %d, Czas: %s".formatted(
-                    temp.getRelations().size(),
-                    temp.getTime()
-            ));
+            executionTimeLabel.setText(
+                    MessageFormat.format(
+                        I18n.t("results.numAndTime"),
+                        temp.getRelations().size(),
+                        temp.getTime()
+                ));
             Utils.setAccessible(executionTimeLabel, executionTimeLabel.getText());
         });
 
         exportButton.addActionListener(e -> {
             if (results == null || results.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
-                        "Brak danych do eksportu.",
-                        "Eksport CSV",
+                        I18n.t("results.exportNoData"),
+                        I18n.t("button.csvExport"),
                         JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
@@ -306,13 +320,13 @@ public class FindDialog extends JDialog {
 
             if (success) {
                 JOptionPane.showMessageDialog(this,
-                        "Eksport zakończony pomyślnie.\nPlik: src/main/resources/" + fileToSave.getName(),
-                        "Eksport CSV",
+                        MessageFormat.format(I18n.t("messageBox.csvExportSuccess"), fileToSave.getName()),
+                        I18n.t("button.csvExport"),
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this,
-                        "Błąd przy eksporcie CSV.",
-                        "Eksport CSV",
+                        I18n.t("messageBox.csvExportError"),
+                        I18n.t("button.csvExport"),
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -350,8 +364,8 @@ public class FindDialog extends JDialog {
         if (results == null || results.isEmpty()) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Nie znaleziono wyników.",
-                    "Brak wyników",
+                    I18n.t("results.noResultsFound"),
+                    I18n.t("results.noResults"),
                     JOptionPane.INFORMATION_MESSAGE
             );
             return;

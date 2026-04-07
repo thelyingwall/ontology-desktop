@@ -1,9 +1,11 @@
 package org.ontology.ui;
 
 import org.ontology.service.AppService;
+import org.ontology.service.I18n;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.MessageFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,7 +21,7 @@ public class DetailsDialog extends JDialog {
 
 
     public DetailsDialog(Frame owner, AppService appService, String rekord, Boolean isView) {
-        super(owner, isView ? "Szczegóły" : "Edycja", true);
+        super(owner, isView ? I18n.t("button.details") : I18n.t("button.editing"), true);
         if (isView)
             this.details(owner, appService, rekord);
         else this.edit(owner, appService, rekord);
@@ -62,7 +64,7 @@ public class DetailsDialog extends JDialog {
             topPanel.add(label, gbc);
 
             JTextField field = new JTextField(30);
-            field.setText(value != null ? value : "Brak danych");
+            field.setText(value != null ? value : I18n.t("results.noData"));
             field.setEditable(false);
 
             label.setLabelFor(field);
@@ -79,7 +81,7 @@ public class DetailsDialog extends JDialog {
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton closeButton = new JButton("Zamknij");
+        JButton closeButton = new JButton(I18n.t("button.close"));
         closeButton.addActionListener(e -> dispose());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -125,7 +127,7 @@ public class DetailsDialog extends JDialog {
             topPanel.add(label, gbc);
 
             JTextField field = new JTextField(30);
-            field.setText(value != null ? value : "Brak danych");
+            field.setText(value != null ? value : I18n.t("results.noData"));
             field.setEditable(true);
 
             label.setLabelFor(field);
@@ -144,10 +146,10 @@ public class DetailsDialog extends JDialog {
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton cancelButton = new JButton("Anuluj");
+        JButton cancelButton = new JButton(I18n.t("button.cancel"));
         cancelButton.addActionListener(e -> dispose());
 
-        JButton saveButton = new JButton("Zapisz");
+        JButton saveButton = new JButton(I18n.t("button.save"));
         saveButton.addActionListener(e -> {
 
             Map<String, String> updatedValues = new LinkedHashMap<>();
@@ -173,7 +175,7 @@ public class DetailsDialog extends JDialog {
 
     //nowe indywiduum
     public DetailsDialog(Frame owner, AppService appService, String className) {
-        super(owner, "Nowa instancja", true);
+        super(owner, I18n.t("newInstance"), true);
         boolean noLocalization = appService.noLocalization(className);
         Map<String, String> properties = new LinkedHashMap<>();
 
@@ -187,10 +189,10 @@ public class DetailsDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(4, 4, 4, 4);
 
-        JLabel recordLabel = new JLabel("Nowa instancja dla klasy " + className);
+        JLabel recordLabel = new JLabel(MessageFormat.format(I18n.t("newInstanceFor"), className));
         recordLabel.setFont(recordLabel.getFont().deriveFont(Font.BOLD));
 
-        Utils.setAccessible(recordLabel, "Nowa instancja dla klasy " + className);
+        Utils.setAccessible(recordLabel, MessageFormat.format(I18n.t("newInstanceFor"), className));
 
         gbc.gridy = 0;
         gbc.gridwidth = 2;
@@ -217,22 +219,22 @@ public class DetailsDialog extends JDialog {
         JTextField longitudeField = new JTextField(10);
 
         if (!noLocalization) {
-            JLabel localizationLabel = new JLabel("Lokalizacja:");
+            JLabel localizationLabel = new JLabel(I18n.t("localization.label") + ":");
             gbc.gridy = 2;
             gbc.gridx = 0;
             gbc.gridwidth = 1;
             gbc.fill = GridBagConstraints.NONE;
             gbc.weightx = 0;
-            Utils.setAccessible(localizationLabel, "Lokalizacja");
+            Utils.setAccessible(localizationLabel, I18n.t("localization.label"));
             topPanel.add(localizationLabel, gbc);
 
             JPanel gpsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
-            gpsPanel.add(new JLabel("szer. geo.:"));
-            Utils.setAccessible(latitudeField, "szerokość geograficzna");
+            gpsPanel.add(new JLabel(I18n.t("localization.latitude")));
+            Utils.setAccessible(latitudeField, I18n.t("localization.latitude.label"));
             gpsPanel.add(latitudeField);
-            gpsPanel.add(new JLabel("dł. geo.:"));
-            Utils.setAccessible(longitudeField, "długość geograficzna");
+            gpsPanel.add(new JLabel(I18n.t("localization.longitude")));
+            Utils.setAccessible(longitudeField, I18n.t("localization.longitude.label"));
             gpsPanel.add(longitudeField);
 
             gbc.gridx = 1;
@@ -258,10 +260,10 @@ public class DetailsDialog extends JDialog {
 
         add(topPanel, BorderLayout.NORTH);
 
-        JButton cancelButton = new JButton("Anuluj");
+        JButton cancelButton = new JButton(I18n.t("button.cancel"));
         cancelButton.addActionListener(e -> dispose());
 
-        JButton saveButton = new JButton("Zapisz");
+        JButton saveButton = new JButton(I18n.t("button.save"));
         saveButton.addActionListener(e -> {
             String name = nameField.getText().trim();
             String latitude = latitudeField.getText().replace(',', '.').trim();
@@ -269,14 +271,20 @@ public class DetailsDialog extends JDialog {
             String comment = commentField.getText().trim();
 
             if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Pole " + NAMED_INDIVIDUAL + " jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        MessageFormat.format(I18n.t("messageBox.requiredError"), NAMED_INDIVIDUAL),
+                        I18n.t("messageBox.error"),
+                        JOptionPane.ERROR_MESSAGE);
                 nameField.requestFocus();
                 return;
             }
             if (!noLocalization) {
 
                 if (latitude.isEmpty() || longitude.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Pole Lokalizacja jest wymagane!", "Błąd", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            MessageFormat.format(I18n.t("messageBox.requiredError"), I18n.t("localization.label")),
+                            I18n.t("messageBox.error"),
+                            JOptionPane.ERROR_MESSAGE);
                     latitudeField.requestFocus();
                     longitudeField.requestFocus();
                     return;
@@ -285,9 +293,8 @@ public class DetailsDialog extends JDialog {
                 if (!appService.isValidLatitude(latitude)) {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Niepoprawna szerokość geograficzna.\n" +
-                                    "Zakres: -90 do 90",
-                            "Błąd",
+                                    I18n.t("messageBox.latitudeError"),
+                                    I18n.t("messageBox.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
                     latitudeField.requestFocusInWindow();
@@ -297,9 +304,8 @@ public class DetailsDialog extends JDialog {
                 if (!appService.isValidLongitude(longitude)) {
                     JOptionPane.showMessageDialog(
                             this,
-                            "Niepoprawna długość geograficzna.\n" +
-                                    "Zakres: -180 do 180",
-                            "Błąd",
+                            I18n.t("messageBox.longitudeError"),
+                                    I18n.t("messageBox.error"),
                             JOptionPane.ERROR_MESSAGE
                     );
                     longitudeField.requestFocusInWindow();
@@ -321,18 +327,21 @@ public class DetailsDialog extends JDialog {
                 success = appService.saveInstance(properties);
                 if (success) {
                     saved = true;
-                    message = "Sukces! Indywiduum zostało dodane do modelu ontologii w pamięci aplikacji. W celu trwałego zapisania zmian należy zapisać ontologię.";
+                    message = I18n.t("messageBox.saveOntologyModelIndividualSuccess");
                     messageType = JOptionPane.INFORMATION_MESSAGE;
                 } else {
-                    message = "Błąd";
+                    message = I18n.t("messageBox.error");
                     messageType = JOptionPane.ERROR_MESSAGE;
                 }
             } catch (Exception ex) {
-                message = "Wystąpił błąd: " + ex.getMessage();
+                message = I18n.t("messageBox.errorOccurred") + ex.getMessage();
                 messageType = JOptionPane.ERROR_MESSAGE;
             }
 
-            JOptionPane.showMessageDialog(this, message, "Informacja", messageType);
+            JOptionPane.showMessageDialog(this,
+                    message,
+                    I18n.t("information"),
+                    messageType);
 
             if (success) dispose();
         });
