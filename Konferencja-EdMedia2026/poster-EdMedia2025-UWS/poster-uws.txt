@@ -1,0 +1,92 @@
+ Developing The Imagination and Logical Thinking of Visually Impaired Pupils
+                 Through Sound-Based Puzzles and Riddles
+                                                              Rafal Wilinski1 and Dariusz Mikulowski1
+                                                      1
+                                                        University of Siedlce, Faculty of Exact and Natural Sciences
+
+
+
+Motivation and Background
+                                                                                                 The next one is an audio puzzle solving module. The user can choose one of several
+Logic games like puzzles and riddles are very popular among users. However, blind people
+                                                                                                 sets of puzzles that are grouped according to the level of diﬀiculty.
+have limited access to this type of entertainment due to a lack of accessibility.
+                                                                                                 The easiest level is one in which the user receives a description and an indication of place
+The project aimed to create a universal application that develops the logical thinking and
+                                                                                                 where he should arrange each piece.
+imagination of visually impaired students through interactive riddles and audio-supported
+                                                                                                 E.g, a shadow of a tree and a meadow. Put it on lower right corner.
+puzzles. The application enables joint play for sighted and blind people, thus supporting
+                                                                                                 More diﬀicult levels have no descriptions about their correct place in the puzzle.
+the integration and development of their cognitive competencies.
+
+Related Works
+Numerous studies have confirmed the positive impact of educational games on developing
+cognitive skills and creativity.
+(Barnabé et al. 2023) demonstrated that system dynamics-based games can significantly
+enhance learners’ critical thinking and project management competencies.
+Similarly, (Mercier et al. 2024) found that frequent engagement with board games
+correlates with higher workplace creativity and a stronger creative self-concept.
+In another study, (Chukusol et al. 2024) introduced a challenge-based hybrid learning                                                  Figure 4: Selecting puzzle to solve
+model using virtual board games, which proved effective in fostering research creativity and     While solving the puzzle, the player moves around the board using the arrow keys and
+critical thinking among students.                                                                replaces pieces of puzzles with the enter key.
+For visually impaired users, platforms like RS Games and Crazy Party Games,                      The descriptions help in the arrangement of elements and their view are read on a regular
+(Pragma, n.d.) offer sound-based games without graphical user interfaces, focusing solely        basis.
+on audio navigation.
+Although accessible for blind users, these games often exclude sighted users who might
+wish to play collaboratively.
+As (Lewis n.d.) highlights, many audio games lack a GUI, making them less inclusive.
+In contrast, the application presented in our work (Wilinski R. 2025) combines a sound
+interface with a universally designed graphical layout, enabling joint gameplay and learning
+experiences for blind, visually impaired, and sighted users.
+
+Audio Puzzle Game - How it Works?                                                                             Figure 5: Solving the puzzle with forest picture, with audio description.
+A game was implemented as a web application in Angular with a database in Google Cloud.          After solving the puzzle, the result is presented to the user.
+It was created in accordance with the ARIA standard. Due to this, it is fully compatible
+with screen readers.
+
+
+
+
+                                                                                                                                       Figure 6: Results of solved puzzles
+
+                          Figure 1: Main screen of the puzzle game.                              Results
+The game consists of two modules.                                                                The pilot version of the game has been tested by three blind users.
+The first one is the riddle solving module where the user can solve logical text riddles         A positive reception was obtained, especially for the feature of description of the puzzle
+that have been grouped into several sets.                                                        elements and intuitive navigation across the puzzle game.
+                                                                                                 Users have reported a desire to expand the application with new sets of puzzles and the
+                                                                                                 ability to add their puzzles after logging in.
+                                                                                                 The modernization and development of the application are planned in these directions.
+
+                                                                                                 Conclusions
+                                                                                                 The proposed solution is an example of an inclusive approach to educational games,
+                                                                                                 combining a graphic and an audio interface. The application develops spatial imagination
+                                                                                                 and logical thinking while entertaining.
+                                                                                                 Game investments among more users and gathering their opinions are planned as well as an
+                                   Figure 2: Solving riddles                                     extension of the content and functionality of the application as users suggested.
+After solving the whole set of riddles, the player is notified of the result of his fun.
+                                                                                                 References
+                                                                                                 Barnabé, F., Armenia, S., Nazir, S., Pompei, A., 2023. Critical thinking skills enhancement through system dynamics-based
+                                                                                                 games: Insights from the project management board game project. Syst. 11, 554.
+                                                                                                 Chukusol, C., Nilsook, P., Wannapiroon, P., (2024). Challenge-based hybrid learning model using virtual board game
+                                                                                                 platforms. International Education Studies.
+                                                                                                 Games, R., n.d. RS games. Available at: https://rsgames.org/ (last access 16 01 2025).
+                                                                                                 Lewis, V., n.d. Audio games for blind and low vision gamers. Available at:
+                                                                                                 https://veroniiiica.com/audio-games-for-blind-low-vision-gamers/ (Last access 16 01 2025).
+                                                                                                 Mercier M., Bourgeois-Bougrine S., and Lubart T., Board games and creativity: Playfulness as a mediator’, Simulation &
+                                                                                                 Gaming, 2024. doi: 10.1177/10468781241289512
+                                                                                                 Pragma, P., n.d. Crazy party. Available at: http://pragmapragma.free.fr/crazy-party/en/index.php (last access 16 01 2025).
+                                                                                                 Wilinski, R. W. (2025) ”Projekt i realizacja udźwiękowionej gry puzzle przystosowanej dla użytkowników niewidomych” (in
+                               Figure 3: Results of riddle game                                  Polish). Engineering thesis, University of Siedlce, Poland.
+
+
+
+
+                                                                                                                                                                                                                .   .   .     . . . .     . . . .     . . . .       .   .       .   .   .
+                                                                                                                                                                                                            .   .   .       . . . .     . . . .     . . . .     .   .       .   .   .
+
+
+
+
+                         EdMedia 2025, Barcelona, May 19–23                                    rw86221@stud.uws.edu.pl, dariusz.mikulowski@uws.edu.pl
+
