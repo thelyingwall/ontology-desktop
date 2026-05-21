@@ -10,7 +10,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{modeling a city space to support orientation skils of the blind users with a dedicated ontology and a neighborhood graph}
+\title{Modeling a City Space To Support Orientation Skills Of the Blind Users With a Dedicated Ontology And a Neighborhood Graph}
 \author{\IEEEauthorblockN{1\textsuperscript{st} Alicja Rojek}
 \IEEEauthorblockA{\textit{dept. Faculty of Exact and Natural Sciences (WNSP.)} \\
 \textit{University of Siedlce  (UWS.)}\\
@@ -35,15 +35,41 @@ Ontology, Space orientation, Blind users, Semantic languages, Graph path finding
 \end{IEEEkeywords}
 
 \section{Introduction}
-Independent functioning in a complex urban environment is one of the greatest challenges for blind and visually impaired people. This process is often fraught with high levels of stress, especially in situations of disorientation or accidental entry onto the roadway in an unauthorized place. The development of modern information technologies opens up new possibilities for creating intelligent systems supporting spatial orientation. The key aspect here is not only the mapping of geometric data, but above all the semantic capture of relations and dependencies between urban infrastructure elements, such as sidewalks, pedestrian crossings, or architectural obstacles. Creating a formalized knowledge model in the form of an ontology allows for the construction of advanced navigation systems and simulation environments that enable safe orientation skills training in laboratory conditions.
+Independent functioning in a complex urban environment is one of the greatest challenges for blind and visually impaired people. This process is often fraught with high levels of stress, especially in situations of disorientation or accidental entry onto the roadway in an unauthorized place. 
+% nawigacja jest wspierana przez technologie w dzisiejszych czasach
+% wspomnimy o aplikacjach nawigacyjnych standardowych i dla niewidomych Dotwalker, Seeing asistant go, ale one wspierają nawigacje na zewnątrz
+% Wayfinder, 
+% projekty wykrywające przeszkody, projekty z inteligentnymi okularami opisującymi przestrzen można o tym wspomnieć.
+% inny problem to nawigacja wewnątrz budynków
+% są systemy prototypy Totu points, Havcog, NaviSecure
+% ale nauczani i trenowanie orientacji nie jest za bardzo rozwiązane
+% próby to gry edykacyjne wspierające  SzubaMikułowski
+% ten problem próbujemy rozwiązać przez ontologie
+The development of modern information technologies opens up new possibilities for creating intelligent systems supporting spatial orientation. The key aspect here is not only the mapping of geometric data, but above all the semantic capture of relations and dependencies between urban infrastructure elements, such as sidewalks, pedestrian crossings, or architectural obstacles. Creating a formalized knowledge model in the form of an ontology allows for the construction of advanced navigation systems and simulation environments that enable safe orientation skills training in laboratory conditions.
+% Co w każdym dalszym rozdziale pracy.
 
 \section{Literature}
+% że wspieranie nawigacji zwłaszcza niewidomych jest opisane w literaturze i są projekty prubujące to rozwiązać
+% tu o projektach indoor i outdoor ale dokładniej np. o Navcog 2 zdania, o Navisecure. 
+
+ 
+% ontologie to jeden ze sposobów gromadzenia i porządkowania wiedzy i złożonych pojęć i tu trochę o reprezentacji danych z książki.
+% o ontologiach fundamentalnych i dziedzinowych, o języku OWL RDF można wspomnieć.
 Ontologies form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
-The literature points to their key role in building interoperable geographic information systems \cite{SUN2019}. 
+The literature points to their key role in building interoperable 
+% więcej artykułów o tym piszących i można po 1 2 zdania o artykule co wnim jest.
+geographic information systems \cite{SUN2019}. 
+% wymienić istniejące ontologie do opisywania przestzeni 
 These technologies find particular application in systems dedicated to people with visual impairments. 
 For example, the works of Mikułowski \cite{Mikulowski2017} and Mikułowski and Szuba \cite{MikulowskiSzuba2025} explore the use of ontologies in virtual sound reality (Virtual Sound Reality – VSR) environments supported by binaural sound, which allows for the creation of immersive educational scenarios. Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of blind people. Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
+% ustawić nasz eksperyment w porównaniu do istniejących ontologii reprezentujących mapy 
+% że wedłóg najlepszej wiedzy autorów nie ma takich systemów wspomagających nawigacje i rozwijanie umiejętności orientacji orientacji
+% aby zrobić krok w strone rozwiązanie tego problemu zrobiliśmy nasz eksperyment.
 
 \section{Experiment Procedure}
+% tu zrobimy podsekcje tak jak w pracy 
+% najpierw ogólnie może być w punktach kolejne kroki naszego eksperymentu a potem każda sekcja.
+
 As part of the conducted research, a proprietary application in Java was developed, using the Apache Jena library to manage the urban ontology saved in RDF/OWL format. The research process was divided into several stages:
 \begin{enumerate}
 \item Preparation of the ontology: A model comprising 60 classes in a hierarchical structure was constructed (including InfrastructureForPedestrians, RoadInfrastructure, ElementsOfCityArchitecture). 431 individuals (urban objects) and key relations were defined, such as hasDirectNeighbor (neighborhood), isLocatedOn (location of an object on another object), and recordedInTheLocation (assignment of sound messages to objects).
@@ -53,18 +79,27 @@ As part of the conducted research, a proprietary application in Java was develop
 The algorithms returned a consistent route comprising 5 intermediate nodes (mainly sections of sidewalks and streets), and the operation time fluctuated between 28–32 ms.
 \end{enumerate}
 
+\section{results}
+% w tej sekcji opisujemy liczbowe ilościowe i jakościowe wyniki
+% co w ontologii ile klas itd ile zapytan ile tras ile punktów miały i wnioski że udał sie ksperyment 
+
 \section{Conclusions}
+% jednym 2 zdania na czym poleał eksperyment 
 The conducted experiment confirmed the effectiveness of combining object ontologies with graph databases in modeling urban space. The main conclusions from the research are as follows:
  Route optimization: Routes determined by standard shortest path algorithms require further personalization for blind people. It is necessary to introduce graph edge weights that would favor continuous sections of sidewalks and the presence of landmarks (e.g., sound signals) while avoiding complex intersections.
  Technological performance: The integration of SPARQL and Neo4j allows for efficient processing of spatial relations, which constitutes a solid foundation for navigation engines in assistive systems.
  Limitations and the future: The current challenge remains the labor-intensiveness of manual ontology modeling. Future work should focus on automating data acquisition (e.g., through LiDAR or OCR) and on testing generated routes with blind users in a VR environment.
+% w tej sekcji zostawimy mniej więcej to co jest ewentualnie rozbudujemy i wyjaśnimy niektóre zdania.
 
 This method has shown great potential in building training systems that will allow people with visual impairments to safely familiarize themselves with the city's topography before going out into the field.
 
 \section*{References}
 
-
 \begin{thebibliography}{00}
+% artykułów można szukac w: Semantic schoolar, google schoolar, scopus, research gate.
+% je śli cytujemy aplikacje to podajemy tytuł strony, autor/organizacja adr \url{adres} data dostępu.
+% jeśli o aplikacji jest arykuł to lepiej go zacytować jeśli nie ma to można stronę.
+
 \bibitem{Mikulowski2017} Mikułowski, D. (2017). An Approach for Ontologically Supporting Space Orientation Teaching of Blind Pupils Using Virtual Sound Reality. International Conference on Interactive Collaborative Learning.
 \bibitem{MikulowskiSzuba2025} Mikułowski, D., Szuba, B. (2025). Supporting the Development of Spatial Orientation Skills of Blind People Using Binaural Sounds in the VSR Game. Studia Informatica. System and information technology.
 \bibitem{SUN2019} Sun, K., Zhu, Y., Pan, P., Hou, Z., Wang, D., Li, W., Song, J. (2019). Geospatial data ontology: the semantic foundation of geospatial data integration and sharing. Big Earth Data, 3, 269 - 296.
