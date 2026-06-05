@@ -64,8 +64,19 @@ For example, the works of Mikułowski \cite{Mikulowski2017} and Mikułowski and 
 
 \section{Experiment Procedure}
 
-As part of the conducted research, a proprietary application in Java was developed, using the Apache Jena library to manage the urban ontology saved in RDF/OWL format as shown in Figure~\ref{fig:triple}.
-\renewcommand{\figurename}{Figure}
+As part of the conducted research, a proprietary application in Java was developed, using the Apache Jena library to manage the urban ontology saved in RDF/OWL format. The research process was divided into several stages:
+\begin{enumerate}
+\item Preparation of the ontology: A model comprising 60 classes in a hierarchical structure was constructed (including InfrastructureForPedestrians, RoadInfrastructure, ElementsOfCityArchitecture). 431 individuals (urban objects) and key relations were defined, such as hasDirectNeighbor (neighborhood), isLocatedOn (location of an object on another object), and recordedInTheLocation (assignment of sound messages to objects).
+\item Semantic exploration: The application allowed for executing SPARQL queries and operations via the Jena API to search for neighborhood relations. Performance tests were conducted, which showed that while the first SPARQL query may take longer due to loading data into memory, this approach exhibits high efficiency with large datasets.
+\item Graph construction and path analysis: Neighborhood relations were exported to CSV format and then imported into the Neo4j graph database. The created graph consisted of 235 nodes and 493 edges. Using the Cypher language and the Graph Data Science (GDS) library, shortest path algorithms were tested: ShortestPath, Dijkstra, and Yens.
+\item Test scenario: An example task involved determining a path between the objects stairsBankZachodniWBK and cityHallUrzadMiastaSkwerNiepodleglosci.
+The algorithms returned a consistent route comprising 5 intermediate nodes (mainly sections of sidewalks and streets), and the operation time fluctuated between 28–32 ms.
+\end{enumerate}
+
+\subsection{Preparation of the Ontology (CityOntoNavi)}
+The first step of the study was to load a specialized digital map, called the CityOntoNavi ontology, into a custom-made computer program. This digital map is a detailed representation of a real part of the city of Siedlce. It includes much more than just a basic layout; it features specific urban items like streets, buildings, traffic lights, advertising poles, and even ATMs.
+To keep all this information organized, we created 60 different categories (known as classes) arranged in a "family tree" structure. This means large groups, such as "Road Infrastructure," contain smaller, more specific groups like "Infrastructure for Pedestrians". Inside these categories, we placed 431 individual objects found in the city. Each object is described by its own set of details, such as its name and its exact location using geographic coordinates as shown in Fig.~\ref{fig:triple}.
+
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{triple.png}}
@@ -73,19 +84,7 @@ As part of the conducted research, a proprietary application in Java was develop
     \label{fig:triple}
 \end{figure}
 
-The research process was divided into several stages:
-\begin{enumerate}
-\item Preparation of the ontology: A model comprising 60 classes in a hierarchical structure was constructed (including InfrastructureForPedestrians, RoadInfrastructure, ElementsOfCityArchitecture). 431 individuals (urban objects) and key relations were defined, such as hasDirectNeighbor (neighborhood), isLocatedOn (location of an object on another object), and recordedInTheLocation (assignment of sound messages to objects).
-\item Semantic exploration: The application allowed for executing SPARQL queries and operations via the Jena API to search for neighborhood relations. Performance tests were conducted, which showed that while the first SPARQL query may take longer due to loading data into memory, this approach exhibits high efficiency with large datasets.
-\item Graph construction and path analysis: Neighborhood relations were exported to CSV format and then imported into the Neo4j graph database. The created graph consisted of 235 nodes and 493 edges. Using the Cypher language and the Graph Data Science (GDS) library, shortest path algorithms were tested: ShortestPath, Dijkstra, and Yens.
-\item Test scenario: An example task involved determining a path between the objects stairsBankZachodniWBK and cityHallUrzadMiastaSkwerNiepodleglosci. 
-The algorithms returned a consistent route comprising 5 intermediate nodes (mainly sections of sidewalks and streets), and the operation time fluctuated between 28–32 ms.
-\end{enumerate}
-
-\subsection{Preparation of the Ontology (CityOntoNavi)}
-The first step of the study was to load a specialized digital map, called the CityOntoNavi ontology, into a custom-made computer program. This digital map is a detailed representation of a real part of the city of Siedlce. It includes much more than just a basic layout; it features specific urban items like streets, buildings, traffic lights, advertising poles, and even ATMs.
-To keep all this information organized, we created 60 different categories (known as classes) arranged in a "family tree" structure. This means large groups, such as "Road Infrastructure," contain smaller, more specific groups like "Infrastructure for Pedestrians". Inside these categories, we placed 431 individual objects found in the city. Each object is described by its own set of details, such as its name and its exact location using geographic coordinates.
-What makes this system truly useful is how these objects are linked together. We defined 32 different types of connections (properties) to show how things relate to one another, as illustrated in Figure~\ref{fig:class}. For example:
+What makes this system truly useful is how these objects are linked together. We defined 32 different types of connections (properties) to show how things relate to one another, as illustrated in Fig.~\ref{fig:class}. For example:
 
 \begin{enumerate}
 \item hasDirectNeighbor: This tells the system which objects are right next to each other in the real world.
@@ -100,7 +99,7 @@ What makes this system truly useful is how these objects are linked together. We
     \label{fig:class}
 \end{figure}
 
-To manage all this data, we developed a Java application with a simple visual interface shown in Figure~\ref{fig:app_results}. 
+To manage all this data, we developed a Java application with a simple visual interface shown in Fig.~\ref{fig:app_results}.
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{app_results.png}}
@@ -108,13 +107,20 @@ To manage all this data, we developed a Java application with a simple visual in
     \label{fig:app_results}
 \end{figure}
 
-Using this program, a user can easily browse the city map, search for specific items, and perform basic tasks like adding, editing, or deleting objects.
+Using this program, users can easily browse the city map, search for specific items, and perform basic operations such as adding, editing, and deleting objects, as well as defining new relationships between them (see Fig.~\ref{fig:new_relation}).
+
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[width=0.47\textwidth]{new_relation.png}}
+    \caption{Adding a new relation to the ontology.}
+    \label{fig:new_relation}
+\end{figure}
+
 However, it is important to note that the application does its work in the computer's temporary working memory (RAM). This means that any changes or new information must be manually saved to a file, or they will be lost once the program is turned off.
 
 \subsection{Semantic Exploration and Query Scenarios}
-The application we built makes it easy to find specific objects in the city by looking at the groups (classes) they belong to or the details (properties) they have, as illustrated in Figure~\ref{fig:app_relations}. 
+The application we built makes it easy to find specific objects in the city by looking at the groups (classes) they belong to or the details (properties) they have, as illustrated in Fig.~\ref{fig:app_relations}.
 
-\renewcommand{\figurename}{Figure}
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{app_relations.png}}
@@ -122,7 +128,14 @@ The application we built makes it easy to find specific objects in the city by l
     \label{fig:app_relations}
 \end{figure}
 
-For example, a user can search for all "traffic lights" or find a specific "bank" based on its name.
+\begin{figure}[h]
+    \centering
+    \fbox{\includegraphics[width=0.47\textwidth]{new_relation_search.png}}
+    \caption{Searching for recently added relations in the application.}
+    \label{fig:new_relation_search}
+\end{figure}
+
+For example, a user can search for all "traffic lights" or find a specific "bank" based on its name, as well as search for relationships in the ontology that they have previously added (see Figs.~\ref{fig:new_relation} and~\ref{fig:new_relation_search}).
 A major part of our test was comparing two different ways the computer can "think" when searching for this information:
 
 \begin{enumerate}
@@ -140,8 +153,8 @@ The final result was a complete, digital map of that part of the city. This netw
 \subsection{Pathfinding Analysis and Test Scenario}
 The graph we built in the previous step was very important because it allowed us to look for the best ways to travel between different city objects. To do this, we used a special set of tools called the Graph Data Science (GDS) library, which is a part of the Neo4j system designed specifically for analyzing connections. We wanted to see how well the system could find a path in a real-world situation.
 For our test, we chose a specific task: finding a route from the stairs at Bank Zachodni WBK to the City Hall at Skwer Niepodległości. We did not just use one method; we tested three different mathematical methods, or algorithms, called ShortestPath, Dijkstra, and Yens, to see if they would all agree on the best way to go.
-The results were very successful. Every algorithm we tried found the exact same path. This route took the user through 5 different intermediate points as shown in Figure~\ref{fig:graph}, which were mostly segments of sidewalks and streets. What was even more impressive was the speed of the system. The computer was able to calculate the entire path in just 28 to 32 milliseconds. This experiment proves that taking detailed information from an ontology and putting it into a graph database is a very fast and effective way to handle city navigation tasks.
-\renewcommand{\figurename}{Figure}
+The results were very successful. Every algorithm we tried found the exact same path. This route took the user through 5 different intermediate points as shown in Fig.~\ref{fig:graph}, which were mostly segments of sidewalks and streets. What was even more impressive was the speed of the system. The computer was able to calculate the entire path in just 28 to 32 milliseconds. This experiment proves that taking detailed information from an ontology and putting it into a graph database is a very fast and effective way to handle city navigation tasks.
+
 \begin{figure}[h]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{graph.png}}
