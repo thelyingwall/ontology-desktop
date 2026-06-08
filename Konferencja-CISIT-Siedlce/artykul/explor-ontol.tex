@@ -38,26 +38,54 @@ Ontology, Space orientation, Blind users, Semantic languages, Graph path finding
 Independent functioning in a complex urban environment is one of the greatest challenges for blind and visually impaired people. This process is often fraught with high levels of stress, especially in situations of disorientation or accidental entry onto the roadway in an unauthorized place. 
 
 Nowadays, technology is a huge help for navigation. While many people use basic GPS apps, blind users can use special tools like Dotwalker \cite{Dotwalker}, Seeing Assistant Move \cite{SeeingAssistantMove}, and Wayfinder \cite{Wayfinder}. These apps are specifically made to help people walk safely outside by providing more detailed help than standard maps. Additionally, there are new inventions like smart glasses that use sensors to find obstacles. These devices can describe the environment out loud, helping users understand exactly what is around them in real time.
-However, finding the way inside buildings is still a big problem. Systems like TotuPoint \cite{TOTUPOINT} and NaviSecure \cite{Navisecure} exist, but learning how to use them and staying oriented is still difficult. Educational games by Mikułowski and Szuba \cite{MikulowskiSzuba2025} are a great way to practice these skills. We want to use ontologies to help technology understand how things like sidewalks and crossings are connected. This helps us create safe ways to practice navigation in a laboratory.
+However, finding the way inside buildings is still a big problem. 
+Systems like TotuPoint \cite{TOTUPOINT} and NaviSecure \cite{Navisecure} exist, but learning how to use them and staying oriented is still difficult. 
+Educational games by Mikułowski and Szuba \cite{MikulowskiSzuba2025} are a great way to practice these skills. 
+To address these problems, this work used ontologies to help technology understand how things like sidewalks and crossings are connected. This helps us create safe ways to practice navigation in a laboratory conditions.
 
 The development of modern information technologies opens up new possibilities for creating intelligent systems supporting spatial orientation. The key aspect here is not only the mapping of geometric data, but above all the semantic capture of relations and dependencies between urban infrastructure elements, such as sidewalks, pedestrian crossings, or architectural obstacles. Creating a formalized knowledge model in the form of an ontology allows for the construction of advanced navigation systems and simulation environments that enable safe orientation skills training in laboratory conditions.
 
 The structure of this paper is divided into five main parts. The Literature section provides an overview of semantic data representation and its importance for navigation systems for the visually impaired. In the Experiment Procedure, the development of the CityOntoNavi model and the methods for semantic exploration and graph construction are described in detail. The Results section analyzes the quantitative data and performance efficiency of the pathfinding algorithms. Finally, the Conclusions summarize the experimental findings and suggest future work for developing personalized navigation systems for blind individuals.
 
 \section{Literature}
-% że wspieranie nawigacji zwłaszcza niewidomych jest opisane w literaturze i są projekty prubujące to rozwiązać
-% tu o projektach indoor i outdoor ale dokładniej np. o Navcog 2 zdania, o Navisecure. 
+supporting independent movement and facilitating navigation, especially in the context of blind people, has long been described in the literature 
+There are several approaches trying to solve various problems related to supporting independent travel and navigation of the BVI.
 
- 
-% ontologie to jeden ze sposobów gromadzenia i porządkowania wiedzy i złożonych pojęć i tu trochę o reprezentacji danych z książki.
-% o ontologiach fundamentalnych i dziedzinowych, o języku OWL RDF można wspomnieć.
+Most BVI self-navigation systems focus on supporting outdoor navigation. 
+There are ready-made systems of this type based on GPS, such as the already mentioned Dotwalker \cite{Dotwalker} or Seeing assistant \cite{SeeingAssistantMove}.
+These are applications designed for mobile devices that support GPS and existing open maps in order to provide a blind person with the most detailed information about objects in space.
+Other projects of this type focus more on detecting obstacles and guiding the user in a safe manner.
+These are usually specially designed haptic belts with vibration devices that inform the user about obstacles and suggest the direction of movement \cite{haptic-worning2017}, \cite{haptik-interface2016}.
+There are also several projects of smart glasses \cite{APriyadharshini2025FaceAO}), which, thanks to cameras, microphones and speakers, can communicate with the user, detect obstacles and inform him about them using a synthetic voice \cite{ProfGiriP2025SmartGF}.
+
+Far fewer projects attempt to address the issue of supporting BVI independent movement indoors. 
+In the case of such systems where GPS cannot be used, the problem is to correctly determine the user's current position.
+One of the more complete proposals for such a system was the NavCog project, which enabled navigation inside large public buildings such as airport stations or shopping malls \cite{NavCog2016}.
+It is based on the use of Bluetooth low energy transmitters, the so-called beacons that are placed inside the building.
+The system has a map of such a building with the locations of these transmitters marked.
+When the user receives the signal of several nearby transmitters, the system can calculate his or her approximate position.
+This is how the above-mentioned NaviSecure \cite{Navisecure} system works.
+
+While supporting the process of moving outside and inside buildings is described in various works, the problem of technological support for effective teaching of spatial orientation to blind people has quite few sources.
+Acquiring skills related to independent spatial orientation is stressful, especially for beginner users \cite{Moraes2023DashboardsTS}.
+A step towards solving this problem may be to use several technologies to create simulation virtual environments in which the user could acquire these skills in much less stressful conditions.
+The actual area of the city can be described using the spatial relations that exist between individual objects in space, which are important from the point of view of a blind user.
+Ontologies and semantic approaches seem to be quite well suited for this purpose.
+Additionally, the form of an educational game may be a good way to discover and master these skills in a more enjoyable way.
+A prototype of such a simple game using additional sounds audible in three dimensions and recorded in binaural technology was described in the work of B Szuba and Mikułowski \cite{MikulowskiSzuba2025}.
+
 Ontologies form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
-The literature points to their key role in building interoperable 
-% więcej artykułów o tym piszących i można po 1 2 zdania o artykule co wnim jest.
-geographic information systems \cite{SUN2019}. 
-% wymienić istniejące ontologie do opisywania przestzeni 
+The literature points to their key role in building interoperable geographic space systems \cite{Bai2023ASO}.
+In the paper \cite{SUN2019}, authors propose a unified framework for geospatial data ontology, denoted GeoDataOnt, to establish a semantic foundation for geospatial data integration and sharing. 
+They provide a characteristics hierarchy of geospatial data and analyze the semantic problems for each characteristic. 
+Then they propose the general framework of GeoDataOnt, which is divided into multiple modules.
+A broad applications of their framework is also discussed.
+
 These technologies find particular application in systems dedicated to people with visual impairments. 
-For example, the works of Mikułowski \cite{Mikulowski2017} and Mikułowski and Szuba \cite{MikulowskiSzuba2025} explore the use of ontologies in virtual sound reality (Virtual Sound Reality – VSR) environments supported by binaural sound, which allows for the creation of immersive educational scenarios. Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of blind people. Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
+For example, the works of Mikułowski \cite{Mikulowski2017} explore the use of ontologies in virtual sound reality (Virtual Sound Reality – VSR) environments supported by binaural sound, which allows for the creation of immersive educational scenarios.
+
+Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of blind people. Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
+
 % ustawić nasz eksperyment w porównaniu do istniejących ontologii reprezentujących mapy 
 % że wedłóg najlepszej wiedzy autorów nie ma takich systemów wspomagających nawigacje i rozwijanie umiejętności orientacji orientacji
 % aby zrobić krok w strone rozwiązanie tego problemu zrobiliśmy nasz eksperyment.
@@ -77,7 +105,7 @@ The algorithms returned a consistent route comprising 5 intermediate nodes (main
 The first step of the study was to load a specialized digital map, called the CityOntoNavi ontology, into a custom-made computer program. This digital map is a detailed representation of a real part of the city of Siedlce. It includes much more than just a basic layout; it features specific urban items like streets, buildings, traffic lights, advertising poles, and even ATMs.
 To keep all this information organized, we created 60 different categories (known as classes) arranged in a "family tree" structure. This means large groups, such as "Road Infrastructure," contain smaller, more specific groups like "Infrastructure for Pedestrians". Inside these categories, we placed 431 individual objects found in the city. Each object is described by its own set of details, such as its name and its exact location using geographic coordinates as shown in Fig.~\ref{fig:triple}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{triple.png}}
     \caption{Example triple from the ontology.}
@@ -92,7 +120,7 @@ What makes this system truly useful is how these objects are linked together. We
 \item recordedInTheLocation: This allows the system to attach specific sound messages to certain spots, which is essential for helping people navigate the city.
 \end{enumerate}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{class.png}}
     \caption{A class hierarchy with annotations for a selected class in the Protege.}
@@ -100,7 +128,7 @@ What makes this system truly useful is how these objects are linked together. We
 \end{figure}
 
 To manage all this data, we developed a Java application with a simple visual interface shown in Fig.~\ref{fig:app_results}.
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{app_results.png}}
     \caption{A main screen of ontology exploration desktop application.}
@@ -109,7 +137,7 @@ To manage all this data, we developed a Java application with a simple visual in
 
 Using this program, users can easily browse the city map, search for specific items, and perform basic operations such as adding, editing, and deleting objects, as well as defining new relationships between them (see Fig.~\ref{fig:new_relation}).
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{new_relation.png}}
     \caption{Adding a new relation to the ontology.}
@@ -121,14 +149,14 @@ However, it is important to note that the application does its work in the compu
 \subsection{Semantic Exploration and Query Scenarios}
 The application we built makes it easy to find specific objects in the city by looking at the groups (classes) they belong to or the details (properties) they have, as illustrated in Fig.~\ref{fig:app_relations}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{app_relations.png}}
     \caption{Searching individuals and relations in the application.}
     \label{fig:app_relations}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{new_relation_search.png}}
     \caption{Searching for recently added relations in the application.}
@@ -155,7 +183,7 @@ The graph we built in the previous step was very important because it allowed us
 For our test, we chose a specific task: finding a route from the stairs at Bank Zachodni WBK to the City Hall at Skwer Niepodległości. We did not just use one method; we tested three different mathematical methods, or algorithms, called ShortestPath, Dijkstra, and Yens, to see if they would all agree on the best way to go.
 The results were very successful. Every algorithm we tried found the exact same path. This route took the user through 5 different intermediate points as shown in Fig.~\ref{fig:graph}, which were mostly segments of sidewalks and streets. What was even more impressive was the speed of the system. The computer was able to calculate the entire path in just 28 to 32 milliseconds. This experiment proves that taking detailed information from an ontology and putting it into a graph database is a very fast and effective way to handle city navigation tasks.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{graph.png}}
     \caption{Example of a graph representation of the computed shortest path.}
@@ -193,6 +221,13 @@ This method has shown great potential in building training systems that will all
 \bibitem{MikulowskiSzuba2025} Mikułowski, D., Szuba, B. (2025). Supporting the Development of Spatial Orientation Skills of Blind People Using Binaural Sounds in the VSR Game. Studia Informatica. System and information technology.
 \bibitem{Navisecure} Mikulowski, D., Niewiadomski, A., Salamonczyk, A., Pilski, M., Switalski, P., Terlikowski, G. (2022, November). Supporting Independent Navigation Of Disabled Students In University Campus Using Beacons And Ontology Map. In EdMedia (pp. 1005-1010). Association for the Advancement of Computing in Education (AACE).
 \bibitem{SUN2019} Sun, K., Zhu, Y., Pan, P., Hou, Z., Wang, D., Li, W., Song, J. (2019). Geospatial data ontology: the semantic foundation of geospatial data integration and sharing. Big Earth Data, 3, 269 - 296.
+\bibitem{NavCog2016} D., Ahmetovic,, C., Gleason, C., Ruan, K., Kitani, H., Takagi, C., Asakawa. NavCog: a navigational cognitive assistant for the blind. Proceedings of the 18th International Conference on Human-Computer Interaction with Mobile Devices and Services. 2016.
+\bibitem{haptic-worning2017} V., Hoang, T., Nguyen, T., Le, T., Tran, T., Vuong, N., Vuillerme. Obstacle detection and warning system for visually impaired people based on electrode matrix and mobile Kinect. Vietnam Journal of Computer Science 2017.
+\bibitem{haptik-interface2016} L., B., Merabet, J,. Sánchez, Development of an audio-haptic virtual interface for navigation of large-scale environments for people who are blind. International Conference on Universal Access in Human-Computer Interaction. 2016.
+\bibitem{APriyadharshini2025FaceAO} A.Priyadharshini and V.Karthi and K.Vinoth and K.Diviyapriya and K.Helan Hencida and S.Srimughi. Face and Obstacle Detection based Smart Glasses for Blind and Visually Impaired. 2025 4th International Conference on Automation, Computing and Renewable Systems (ICACRS)
+\bibitem{ProfGiriP2025SmartGF} G. Prof.GiriP. and Mr. Shrinivas M. Ghule and Mr. Ganesh K. Ghodke and Mr. Viraj V. Nadrage. Smart Glasses for Blind People Using Arduino. International Journal of Advanced Research in Science, Communication and Technology (2025).
+\bibitem{Moraes2023DashboardsTS} J., M. L. Moraes and P., Do Carmo F. and M., da Conceiç{\~a}o Carneiro Ara{\'u}jo and B., Costa and M., Amorim and A., Rocha Façanha and J., oel dos Santos and W., Viana. Dashboards to support rehabilitation in orientation and mobility for people who are blind. Proceedings of the 29th Brazilian Symposium on Multimedia and the Web 2023.
+\bibitem{Bai2023ASO} Y., Bai and M., Gr{\"u}ninger. A Spatiotemporal Ontology for Semantic Trajectories (extended abstract). Joint Ontology Workshops 2023.
 \end{thebibliography}
 
 \end{document}
