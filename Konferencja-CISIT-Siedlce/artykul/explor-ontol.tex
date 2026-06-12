@@ -3,9 +3,12 @@
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
+%\usepackage{balance}
+\usepackage{flushend}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -50,31 +53,34 @@ The structure of this paper is divided into five main parts. The Literature sect
 \section{Literature}
 supporting independent movement and facilitating navigation, especially in the context of blind people, has long been described in the literature 
 There are several approaches trying to solve various problems related to supporting independent travel and navigation of the BVI.
-
 Most BVI self-navigation systems focus on supporting outdoor navigation. 
 There are ready-made systems of this type based on GPS, such as the already mentioned Dotwalker \cite{Dotwalker} or Seeing assistant \cite{SeeingAssistantMove}.
 These are applications designed for mobile devices that support GPS and existing open maps in order to provide a blind person with the most detailed information about objects in space.
+
 Other projects of this type focus more on detecting obstacles and guiding the user in a safe manner.
 These are usually specially designed haptic belts with vibration devices that inform the user about obstacles and suggest the direction of movement \cite{haptic-worning2017}, \cite{haptik-interface2016}.
-There are also several projects of smart glasses \cite{APriyadharshini2025FaceAO}), which, thanks to cameras, microphones and speakers, can communicate with the user, detect obstacles and inform him about them using a synthetic voice \cite{ProfGiriP2025SmartGF}.
+There are also several projects of smart glasses which using cameras, microphones and speakers, can communicate with the user, detect obstacles and inform him about them using a synthetic voice \cite{APriyadharshini2025FaceAO}, \cite{ProfGiriP2025SmartGF}.
 
-Far fewer projects attempt to address the issue of supporting BVI independent movement indoors. 
-In the case of such systems where GPS cannot be used, the problem is to correctly determine the user's current position.
+Far fewer projects attempt to address the issue of supporting independent navigation of BVI inside the large public buildings.
+In the case of such systems where GPS cannot be used, one of the main problem is to determine the user's current position.
 One of the more complete proposals for such a system was the NavCog project, which enabled navigation inside large public buildings such as airport stations or shopping malls \cite{NavCog2016}.
-It is based on the use of Bluetooth low energy transmitters, the so-called beacons that are placed inside the building.
+It is based on the use of Bluetooth low energy transmitters (BLE) beacons that are placed in various places in the the building.
 The system has a map of such a building with the locations of these transmitters marked.
-When the user receives the signal of several nearby transmitters, the system can calculate his or her approximate position.
-This is how the above-mentioned NaviSecure \cite{Navisecure} system works.
+When the user receives the signal of several nearby transmitters, the system can calculate his or her approximate position using diferent methods such as triangulation or fingerprint \cite{verma2016}, \cite{kriz2016}.
+An example of a complete system of this type operating based on a set of BLE transmitters and the above-mentioned positioning methods as well as a hierarchical map of the building is the NaviSecure project \cite{Navisecure}.
 
 While supporting the process of moving outside and inside buildings is described in various works, the problem of technological support for effective teaching of spatial orientation to blind people has quite few sources.
 Acquiring skills related to independent spatial orientation is stressful, especially for beginner users \cite{Moraes2023DashboardsTS}.
 A step towards solving this problem may be to use several technologies to create simulation virtual environments in which the user could acquire these skills in much less stressful conditions.
+This set of technologies became proposed under the name Virtual sound reality VSR \cite{Mikulowski2017}.
 The actual area of the city can be described using the spatial relations that exist between individual objects in space, which are important from the point of view of a blind user.
 Ontologies and semantic approaches seem to be quite well suited for this purpose.
 Additionally, the form of an educational game may be a good way to discover and master these skills in a more enjoyable way.
 A prototype of such a simple game using additional sounds audible in three dimensions and recorded in binaural technology was described in the work of B Szuba and Mikułowski \cite{MikulowskiSzuba2025}.
 
-Ontologies form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
+Ontologies, even before the appearance of modern machine learning models and LLM, have long been recognized as one of the good ways to intelligently describe reality.
+A detailed and comprehensive review of semantic solutions that can be used to create various applications managing even very complex data is presented in the book Programming the Semantic Web.  \cite{segaran2009}
+Ontologies also can form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
 The literature points to their key role in building interoperable geographic space systems \cite{Bai2023ASO}.
 In the paper \cite{SUN2019}, authors propose a unified framework for geospatial data ontology, denoted GeoDataOnt, to establish a semantic foundation for geospatial data integration and sharing. 
 They provide a characteristics hierarchy of geospatial data and analyze the semantic problems for each characteristic. 
@@ -84,11 +90,15 @@ A broad applications of their framework is also discussed.
 These technologies find particular application in systems dedicated to people with visual impairments. 
 For example, the works of Mikułowski \cite{Mikulowski2017} explore the use of ontologies in virtual sound reality (Virtual Sound Reality – VSR) environments supported by binaural sound, which allows for the creation of immersive educational scenarios.
 
-Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of blind people. Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
-
-% ustawić nasz eksperyment w porównaniu do istniejących ontologii reprezentujących mapy 
-% że wedłóg najlepszej wiedzy autorów nie ma takich systemów wspomagających nawigacje i rozwijanie umiejętności orientacji orientacji
-% aby zrobić krok w strone rozwiązanie tego problemu zrobiliśmy nasz eksperyment.
+Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of BVI.
+Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
+Existing ontology-based systems for describing geographic data mostly focus on geodetic data and the relationships between large objects on the map \cite{ranatunga2025}.
+To the best of the authors' knowledge, no approaches have been described in the literature that would combine presenting the world from the point of view of a blind user while using the potential offered by ontologies.
+It seems that such solutions would allow the design and creation of systems supporting the teaching of very important skills related to orientation in space to blind students in less stressful than real conditions.
+To take a step towards solving this problem, an experiment described in this work was carried out.
+It consists in creating a dedicated ontology describing a fragment of the city from the BVI perspective, and analyzing it using queries in semantic languages
+Then transforming some relations into a graph and, finally, determining paths as potentially safe routes for the user.
+The details of this experiment are described in the following sections.
 
 \section{Experiment Procedure}
 
@@ -205,18 +215,16 @@ Limitations and the future: The current challenge remains the labor-intensivenes
 
 This method has shown great potential in building training systems that will allow people with visual impairments to safely familiarize themselves with the city's topography before going out into the field.
 
+%\balance
+
 \section*{References}
 
 \renewcommand{\refname}{}
 \begin{thebibliography}{00}
-% artykułów można szukac w: Semantic schoolar, google schoolar, scopus, research gate.
-% je śli cytujemy aplikacje to podajemy tytuł strony, autor/organizacja adr \url{adres} data dostępu.
-% jeśli o aplikacji jest arykuł to lepiej go zacytować jeśli nie ma to można stronę.
-
-\bibitem{Dotwalker} Dotwalker User Guide, https://dotwalker.prv.pl/dwusermanualwstep.html, [Accessed 29-05-2026]
-\bibitem{SeeingAssistantMove} Tutorial Seeing Assistant Move, https://seeingassistant.tt.com.pl/move/tutorial, [Accessed 29-05-2026]
-\bibitem{TOTUPOINT} TOTUPOINT - System origins, https://totupoint.pl/geneza, [Accessed 29-05-2026]
-\bibitem{Wayfinder} Our Solution - Wayfinder App, https://wayfinderapp.co.uk/services/, [Accessed 29-05-2026]
+\bibitem{Dotwalker} Dotwalker User Guide, \url{https://dotwalker.prv.pl/dwusermanualwstep.html}, (Accessed: 29 05 2026).
+\bibitem{SeeingAssistantMove} Tutorial Seeing Assistant Move, \url{https://seeingassistant.tt.com.pl/move/tutorial}, (Accessed 29 05 2026).
+\bibitem{TOTUPOINT} TOTUPOINT - System origins, \url{https://totupoint.pl/geneza}, (Accessed 29 05 2026).
+\bibitem{Wayfinder} Our Solution - Wayfinder App, \url{https://wayfinderapp.co.uk/services}, (Accessed 29 05 2026).
 \bibitem{Mikulowski2017} Mikułowski, D. (2017). An Approach for Ontologically Supporting Space Orientation Teaching of Blind Pupils Using Virtual Sound Reality. International Conference on Interactive Collaborative Learning.v
 \bibitem{MikulowskiSzuba2025} Mikułowski, D., Szuba, B. (2025). Supporting the Development of Spatial Orientation Skills of Blind People Using Binaural Sounds in the VSR Game. Studia Informatica. System and information technology.
 \bibitem{Navisecure} Mikulowski, D., Niewiadomski, A., Salamonczyk, A., Pilski, M., Switalski, P., Terlikowski, G. (2022, November). Supporting Independent Navigation Of Disabled Students In University Campus Using Beacons And Ontology Map. In EdMedia (pp. 1005-1010). Association for the Advancement of Computing in Education (AACE).
@@ -228,6 +236,11 @@ This method has shown great potential in building training systems that will all
 \bibitem{ProfGiriP2025SmartGF} G. Prof.GiriP. and Mr. Shrinivas M. Ghule and Mr. Ganesh K. Ghodke and Mr. Viraj V. Nadrage. Smart Glasses for Blind People Using Arduino. International Journal of Advanced Research in Science, Communication and Technology (2025).
 \bibitem{Moraes2023DashboardsTS} J., M. L. Moraes and P., Do Carmo F. and M., da Conceiç{\~a}o Carneiro Ara{\'u}jo and B., Costa and M., Amorim and A., Rocha Façanha and J., oel dos Santos and W., Viana. Dashboards to support rehabilitation in orientation and mobility for people who are blind. Proceedings of the 29th Brazilian Symposium on Multimedia and the Web 2023.
 \bibitem{Bai2023ASO} Y., Bai and M., Gr{\"u}ninger. A Spatiotemporal Ontology for Semantic Trajectories (extended abstract). Joint Ontology Workshops 2023.
+\bibitem{verma2016} Verma, Shivam; Omanwar, Rohit; Sreejith, V.; Meera, G S. A smartphone based indoor navigation system. 2016 28th International Conference on Microelectronics (ICM).
+\bibitem{kriz2016} Kriz, Pavel; Maly, Filip; Kozel, Tomas. Improving Indoor Localization Using Bluetooth Low Energy Beacons. Mobile Information Systems (2016).
+\bibitem{segaran2009} Segaran, T., Evans, C., Taylor, J., Toby, S., Colin, E., Jamie, T. (2009). Programming the Semantic Web. Oreyli 2009.
+\bibitem{ranatunga2025} Ranatunga S., and Rune S. {\O}deg{\aa}rd and Jetlund K., and E. Onstein. Use of Semantic Web Technologies to Enhance the Integration and Interoperability of Environmental Geospatial Data: A Framework Based on Ontology-Based Data Access. ISPRS Int. J. Geo Inf 2025.
+
 \end{thebibliography}
 
 \end{document}
