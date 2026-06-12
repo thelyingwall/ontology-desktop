@@ -30,7 +30,7 @@ dariusz.mikulowski@uws.edu.pl}
 \maketitle
 
 \begin{abstract}
-Independent functioning of BVI (blind or visually impaired) people in the city involves significant stress and orientation challenges. The aim of this research was to develop a semantic model of urban space using a dedicated ontology and graph database. As part of the work, a model (60 classes, 431 individuals) describing infrastructure and neighborhood relations was prepared. A proprietary Java application with the Apache Jena library was used for data exploration, comparing the performance of SPARQL queries and the API. Neighborhood relations were exported to a Neo4j database, creating a graph with 235 nodes and 493 edges. Using this graph, several pathfinding algorithms were used to determine the best routes for potential navigation. Tests of these algorithms (including Dijkstra’s and Yen’s) demonstrated high efficiency, achieving response times below 32 ms. The experiment confirmed that the integration of ontologies with graphs provides an effective basis for navigation systems. A key conclusion is the necessity of introducing edge weights for route personalization—favoring safe sidewalks and avoiding complex intersections. This solution can support spatial orientation training in safe simulation conditions.
+Independent functioning of BVI (blind or visually impaired) people in the city involves significant stress and orientation challenges. The aim of this research was to develop a semantic model of urban space using a dedicated ontology and graph database. As part of the work, a model (60 classes, 431 individuals) describing infrastructure and neighbourhood relations was prepared. A proprietary Java application with the Apache Jena library was used for data exploration, comparing the performance of SPARQL queries and the API. Neighbourhood relations were exported to a Neo4j database, creating a graph with 235 nodes and 493 edges. Using this graph, several pathfinding algorithms were used to determine the best routes for potential navigation. Tests of these algorithms (including Dijkstra’s and Yen’s) demonstrated high efficiency, achieving response times below 32 ms. The experiment confirmed that integrating ontologies with graphs provides an effective basis for navigation systems. A key conclusion is the necessity of introducing edge weights for route personalisation—favouring safe sidewalks and avoiding complex intersections. This solution can support spatial orientation training in safe simulation conditions.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -38,82 +38,82 @@ Ontology, Space orientation, Blind users, Semantic languages, Graph path finding
 \end{IEEEkeywords}
 
 \section{Introduction}
-Independent functioning in a complex urban environment is one of the greatest challenges for blind and visually impaired people. This process is often fraught with high levels of stress, especially in situations of disorientation or accidental entry onto the roadway in an unauthorized place. 
+Independent functioning in a complex urban environment is one of the greatest challenges for blind and visually impaired people. This process is often fraught with high levels of stress, especially in situations of disorientation or accidental entry onto the roadway in an unauthorised place. 
 
-Nowadays, technology is a huge help for navigation. While many people use basic GPS apps, blind users can use special tools like Dotwalker \cite{Dotwalker}, Seeing Assistant Move \cite{SeeingAssistantMove}, and Wayfinder \cite{Wayfinder}. These apps are specifically made to help people walk safely outside by providing more detailed help than standard maps. Additionally, there are new inventions like smart glasses that use sensors to find obstacles. These devices can describe the environment out loud, helping users understand exactly what is around them in real time.
-However, finding the way inside buildings is still a big problem. 
+Nowadays, technology is a huge help for navigation. While many people use basic GPS apps, blind users can use specialised tools such as Dotwalker \cite{Dotwalker}, Seeing Assistant Move \cite{SeeingAssistantMove}, and Wayfinder \cite{Wayfinder}. These apps are designed to help people walk safely outdoors by providing more detailed guidance than standard maps. Additionally, there are new inventions, such as smart glasses that use sensors to detect obstacles. These devices can describe the environment out loud, helping users understand exactly what is around them in real time.
+However, finding the way inside buildings remains a major problem. 
 Systems like TotuPoint \cite{TOTUPOINT} and NaviSecure \cite{Navisecure} exist, but learning how to use them and staying oriented is still difficult. 
 Educational games by Mikułowski and Szuba \cite{MikulowskiSzuba2025} are a great way to practice these skills. 
-To address these problems, this work used ontologies to help technology understand how things like sidewalks and crossings are connected. This helps us create safe ways to practice navigation in a laboratory conditions.
+To address these problems, this work used ontologies to help technology understand how elements such as sidewalks and crossings are connected. This helps us create safe ways to practice navigation in laboratory conditions.
 
-The development of modern information technologies opens up new possibilities for creating intelligent systems supporting spatial orientation. The key aspect here is not only the mapping of geometric data, but above all the semantic capture of relations and dependencies between urban infrastructure elements, such as sidewalks, pedestrian crossings, or architectural obstacles. Creating a formalized knowledge model in the form of an ontology allows for the construction of advanced navigation systems and simulation environments that enable safe orientation skills training in laboratory conditions.
+The development of modern information technologies opens new possibilities for creating intelligent systems that support spatial orientation. The key aspect here is not only the mapping of geometric data but, above all, the semantic capture of relations and dependencies among urban infrastructure elements, such as sidewalks, pedestrian crossings, and architectural obstacles. Creating a formalised knowledge model as an ontology enables the construction of advanced navigation systems and simulation environments that support safe orientation skills training under laboratory conditions.
 
-The structure of this paper is divided into five main parts. The Literature section provides an overview of semantic data representation and its importance for navigation systems for the visually impaired. In the Experiment Procedure, the development of the CityOntoNavi model and the methods for semantic exploration and graph construction are described in detail. The Results section analyzes the quantitative data and performance efficiency of the pathfinding algorithms. Finally, the Conclusions summarize the experimental findings and suggest future work for developing personalized navigation systems for blind individuals.
+The structure of this paper is divided into five main parts. The Literature section provides an overview of semantic data representation and its importance for navigation systems for the visually impaired. In the Experiment Procedure, the development of the CityOntoNavi model and the methods for semantic exploration and graph construction are described in detail. The Results section analyses the quantitative data and performance efficiency of the pathfinding algorithms. Finally, the Conclusions summarise the experimental findings and suggest future work for developing personalised navigation systems for blind individuals.
 
 \section{Literature}
 supporting independent movement and facilitating navigation, especially in the context of blind people, has long been described in the literature 
-There are several approaches trying to solve various problems related to supporting independent travel and navigation of the BVI.
+There are several approaches aimed at solving various problems related to supporting independent travel and navigation in the BVI.
 Most BVI self-navigation systems focus on supporting outdoor navigation. 
-There are ready-made systems of this type based on GPS, such as the already mentioned Dotwalker \cite{Dotwalker} or Seeing assistant \cite{SeeingAssistantMove}.
-These are applications designed for mobile devices that support GPS and existing open maps in order to provide a blind person with the most detailed information about objects in space.
+There are ready-made GPS-based systems of this type, such as the already mentioned Dotwalker \cite{Dotwalker} and Seeing assistant \cite{SeeingAssistantMove}.
+These are applications designed for mobile devices that support GPS and existing open-source maps to provide a blind person with the most detailed information about objects in space.
 
-Other projects of this type focus more on detecting obstacles and guiding the user in a safe manner.
+Other projects of this type focus more on detecting obstacles and guiding the user safely.
 These are usually specially designed haptic belts with vibration devices that inform the user about obstacles and suggest the direction of movement \cite{haptic-worning2017}, \cite{haptik-interface2016}.
-There are also several projects of smart glasses which using cameras, microphones and speakers, can communicate with the user, detect obstacles and inform him about them using a synthetic voice \cite{APriyadharshini2025FaceAO}, \cite{ProfGiriP2025SmartGF}.
+There are also several smart glasses projects that use cameras, microphones, and speakers, can communicate with the user, detect obstacles, and inform them about them using a synthetic voice \cite{APriyadharshini2025FaceAO}, \cite{ProfGiriP2025SmartGF}.
 
-Far fewer projects attempt to address the issue of supporting independent navigation of BVI inside the large public buildings.
-In the case of such systems where GPS cannot be used, one of the main problem is to determine the user's current position.
-One of the more complete proposals for such a system was the NavCog project, which enabled navigation inside large public buildings such as airport stations or shopping malls \cite{NavCog2016}.
-It is based on the use of Bluetooth low energy transmitters (BLE) beacons that are placed in various places in the the building.
+Far fewer projects attempt to address the issue of supporting BVI independent navigation in large public buildings.
+In such systems where GPS cannot be used, one of the main problems is determining the user's current position.
+One of the more complete proposals for such a system was the NavCog project, which enabled navigation in large public buildings, such as airport stations and shopping malls \cite{NavCog2016}.
+It is based on Bluetooth low energy (BLE) beacons placed in various locations in the building.
 The system has a map of such a building with the locations of these transmitters marked.
-When the user receives the signal of several nearby transmitters, the system can calculate his or her approximate position using diferent methods such as triangulation or fingerprint \cite{verma2016}, \cite{kriz2016}.
-An example of a complete system of this type operating based on a set of BLE transmitters and the above-mentioned positioning methods as well as a hierarchical map of the building is the NaviSecure project \cite{Navisecure}.
+When the user receives signals from several nearby transmitters, the system can calculate his or her approximate position using methods such as triangulation or fingerprinting \cite{verma2016}, \cite{kriz2016}.
+An example of a complete system of this type, operating on a set of BLE transmitters and the above-mentioned positioning methods, along with a hierarchical map of the building, is the NaviSecure project \cite{Navisecure}.
 
-While supporting the process of moving outside and inside buildings is described in various works, the problem of technological support for effective teaching of spatial orientation to blind people has quite few sources.
+While support for moving inside and outside buildings is described in various works, there are few sources on technological support for the effective teaching of spatial orientation to blind people.
 Acquiring skills related to independent spatial orientation is stressful, especially for beginner users \cite{Moraes2023DashboardsTS}.
-A step towards solving this problem may be to use several technologies to create simulation virtual environments in which the user could acquire these skills in much less stressful conditions.
-This set of technologies became proposed under the name Virtual sound reality VSR \cite{Mikulowski2017}.
-The actual area of the city can be described using the spatial relations that exist between individual objects in space, which are important from the point of view of a blind user.
-Ontologies and semantic approaches seem to be quite well suited for this purpose.
+A step towards solving this problem may be to use several technologies to create virtual simulation environments in which the user could acquire these skills under much less stressful conditions.
+This set of technologies became proposed under the name Virtual Sound Reality VSR \cite{Mikulowski2017}.
+The actual area of the city can be described using the spatial relations among individual objects, which are important from a blind user's perspective.
+Ontologies and semantic approaches seem quite well suited to this purpose.
 Additionally, the form of an educational game may be a good way to discover and master these skills in a more enjoyable way.
-A prototype of such a simple game using additional sounds audible in three dimensions and recorded in binaural technology was described in the work of B Szuba and Mikułowski \cite{MikulowskiSzuba2025}.
+A prototype of such a simple game, using additional sounds recorded with binaural technology and rendered in three dimensions, was described in the work by B. Szuba and Mikułowski \cite{MikulowskiSzuba2025}.
 
-Ontologies, even before the appearance of modern machine learning models and LLM, have long been recognized as one of the good ways to intelligently describe reality.
-A detailed and comprehensive review of semantic solutions that can be used to create various applications managing even very complex data is presented in the book Programming the Semantic Web.  \cite{segaran2009}
-Ontologies also can form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
+Ontologies, even before the emergence of modern machine learning models and LLMs, have long been recognised as an effective means of describing reality.
+A detailed and comprehensive review of semantic solutions for creating various applications that manage even very complex data is presented in the book Programming the Semantic Web.  \cite{segaran2009}
+Ontologies can also form the foundation of semantic data representation, enabling the unification of heterogeneous sources of information about urban space. 
 The literature points to their key role in building interoperable geographic space systems \cite{Bai2023ASO}.
-In the paper \cite{SUN2019}, authors propose a unified framework for geospatial data ontology, denoted GeoDataOnt, to establish a semantic foundation for geospatial data integration and sharing. 
-They provide a characteristics hierarchy of geospatial data and analyze the semantic problems for each characteristic. 
-Then they propose the general framework of GeoDataOnt, which is divided into multiple modules.
-A broad applications of their framework is also discussed.
+In the paper \cite{SUN2019}, the authors propose a unified framework for geospatial data ontology, denoted GeoDataOnt, to establish a semantic foundation for geospatial data integration and sharing. 
+They provide a hierarchical characterisation of geospatial data and analyse the semantic problems associated with each characteristic. 
+Then they propose a general framework for GeoDataOnt, divided into multiple modules.
+A broad application of their framework is also discussed.
 
-These technologies find particular application in systems dedicated to people with visual impairments. 
-For example, the works of Mikułowski \cite{Mikulowski2017} explore the use of ontologies in virtual sound reality (Virtual Sound Reality – VSR) environments supported by binaural sound, which allows for the creation of immersive educational scenarios.
+These technologies are particularly well-suited to systems for people with visual impairments. 
+For example, the works of Mikułowski \cite{Mikulowski2017} explore the use of ontologies in virtual sound reality (VSR) environments supported by binaural sound, enabling the creation of immersive educational scenarios.
 
-Despite numerous studies on geographic ontologies, there is still a gap in the integration of semantic spatial models with efficient graph-based pathfinding mechanisms that would be tailored to the specific needs of BVI.
-Exploration of such models requires the use of dedicated query languages, such as SPARQL, and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
-Existing ontology-based systems for describing geographic data mostly focus on geodetic data and the relationships between large objects on the map \cite{ranatunga2025}.
-To the best of the authors' knowledge, no approaches have been described in the literature that would combine presenting the world from the point of view of a blind user while using the potential offered by ontologies.
-It seems that such solutions would allow the design and creation of systems supporting the teaching of very important skills related to orientation in space to blind students in less stressful than real conditions.
+Despite numerous studies on geographic ontologies, there remains a gap in integrating semantic spatial models with efficient, graph-based pathfinding mechanisms tailored to the specific needs of BVI.
+Exploration of such models requires dedicated query languages (e.g., SPARQL) and programming libraries (e.g., Apache Jena), whose performance is crucial when processing large urban datasets.
+Existing ontology-based systems for describing geographic data primarily focus on geodetic data and relationships among large objects on the map \cite{ranatunga2025}.
+To the best of the authors' knowledge, no approaches have been described in the literature that combine presenting the world from a blind user's point of view with the potential offered by ontologies.
+It seems that such solutions would enable the design and creation of systems that support the teaching of very important spatial orientation skills to blind students under less stressful conditions than in real-world settings.
 To take a step towards solving this problem, an experiment described in this work was carried out.
-It consists in creating a dedicated ontology describing a fragment of the city from the BVI perspective, and analyzing it using queries in semantic languages
-Then transforming some relations into a graph and, finally, determining paths as potentially safe routes for the user.
+It consists of creating a dedicated ontology that describes a fragment of the city from the BVI perspective and analysing it using queries in semantic languages.
+Then, transforming some relations into a graph and, finally, determining paths as potentially safe routes for the user.
 The details of this experiment are described in the following sections.
 
 \section{Experiment Procedure}
 
-As part of the conducted research, a proprietary application in Java was developed, using the Apache Jena library to manage the urban ontology saved in RDF/OWL format. The research process was divided into several stages:
+As part of the research, a proprietary Java application was developed using the Apache Jena library to manage the urban ontology in RDF/OWL format. The research process was divided into several stages:
 \begin{enumerate}
-\item Preparation of the ontology: A model comprising 60 classes in a hierarchical structure was constructed (including InfrastructureForPedestrians, RoadInfrastructure, ElementsOfCityArchitecture). 431 individuals (urban objects) and key relations were defined, such as hasDirectNeighbor (neighborhood), isLocatedOn (location of an object on another object), and recordedInTheLocation (assignment of sound messages to objects).
-\item Semantic exploration: The application allowed for executing SPARQL queries and operations via the Jena API to search for neighborhood relations. Performance tests were conducted, which showed that while the first SPARQL query may take longer due to loading data into memory, this approach exhibits high efficiency with large datasets.
-\item Graph construction and path analysis: Neighborhood relations were exported to CSV format and then imported into the Neo4j graph database. The created graph consisted of 235 nodes and 493 edges. Using the Cypher language and the Graph Data Science (GDS) library, shortest path algorithms were tested: ShortestPath, Dijkstra, and Yens.
+\item Preparation of the ontology: A model comprising 60 classes in a hierarchical structure was constructed (including InfrastructureForPedestrians, RoadInfrastructure, ElementsOfCityArchitecture). 431 individuals (urban objects) and key relations were defined, such as hasDirectNeighbor (neighbourhood), isLocatedOn (location of an object on another object), and recordedInTheLocation (assignment of sound messages to objects).
+\item Semantic exploration: The application allowed for executing SPARQL queries and operations via the Jena API to search for neighbourhood relations. Performance tests showed that while the first SPARQL query may take longer due to loading data into memory, this approach remains highly efficient with large datasets.
+\item Graph construction and path analysis: Neighbourhood relations were exported to CSV format and then imported into the Neo4j graph database. The created graph consisted of 235 nodes and 493 edges. Using the Cypher language and the Graph Data Science (GDS) library, shortest path algorithms were tested: ShortestPath, Dijkstra, and Yen's.
 \item Test scenario: An example task involved determining a path between the objects stairsBankZachodniWBK and cityHallUrzadMiastaSkwerNiepodleglosci.
-The algorithms returned a consistent route comprising 5 intermediate nodes (mainly sections of sidewalks and streets), and the operation time fluctuated between 28–32 ms.
+The algorithms returned a consistent route comprising 5 intermediate nodes (mainly sections of sidewalks and streets), and the operation time ranged from 28 to 32 ms.
 \end{enumerate}
 
 \subsection{Preparation of the Ontology (CityOntoNavi)}
-The first step of the study was to load a specialized digital map, called the CityOntoNavi ontology, into a custom-made computer program. This digital map is a detailed representation of a real part of the city of Siedlce. It includes much more than just a basic layout; it features specific urban items like streets, buildings, traffic lights, advertising poles, and even ATMs.
-To keep all this information organized, we created 60 different categories (known as classes) arranged in a "family tree" structure. This means large groups, such as "Road Infrastructure," contain smaller, more specific groups like "Infrastructure for Pedestrians". Inside these categories, we placed 431 individual objects found in the city. Each object is described by its own set of details, such as its name and its exact location using geographic coordinates as shown in Fig.~\ref{fig:triple}.
+The first step of the study was to load a specialised digital map, called the CityOntoNavi ontology, into a custom-made computer program. This digital map is a detailed representation of a real part of the city of Siedlce. It includes much more than just a basic layout; it features specific urban elements such as streets, buildings, traffic lights, advertising poles, and even ATMs.
+To keep all this information organised, we created 60 different categories (known as classes) arranged in a "family tree" structure. This means large groups, such as "Road Infrastructure," contain smaller, more specific groups like "Infrastructure for Pedestrians". Inside these categories, we placed 431 individual objects found in the city. Each object is described by its own set of details, such as its name and its exact location using geographic coordinates as shown in Fig.~\ref{fig:triple}.
 
 \begin{figure}[ht]
     \centering
@@ -125,9 +125,9 @@ To keep all this information organized, we created 60 different categories (know
 What makes this system truly useful is how these objects are linked together. We defined 32 different types of connections (properties) to show how things relate to one another, as illustrated in Fig.~\ref{fig:class}. For example:
 
 \begin{enumerate}
-\item hasDirectNeighbor: This tells the system which objects are right next to each other in the real world.
+\item hasDirectNeighbor: This indicates which objects are directly adjacent to each other in the real world.
 \item isLocatedOn: Specifies the exact street or infrastructure element where an object can be found.
-\item recordedInTheLocation: This allows the system to attach specific sound messages to certain spots, which is essential for helping people navigate the city.
+\item recorded at the location: This allows the system to attach specific audio messages to specific spots, which is essential for helping people navigate the city.
 \end{enumerate}
 
 \begin{figure}[ht]
@@ -141,7 +141,7 @@ To manage all this data, we developed a Java application with a simple visual in
 \begin{figure}[ht]
     \centering
     \fbox{\includegraphics[width=0.47\textwidth]{app_results.png}}
-    \caption{A main screen of ontology exploration desktop application.}
+    \caption{A main screen of the ontology exploration desktop application.}
     \label{fig:app_results}
 \end{figure}
 
@@ -154,7 +154,7 @@ Using this program, users can easily browse the city map, search for specific it
     \label{fig:new_relation}
 \end{figure}
 
-However, it is important to note that the application does its work in the computer's temporary working memory (RAM). This means that any changes or new information must be manually saved to a file, or they will be lost once the program is turned off.
+However, it is important to note that the application operates in the computer's temporary working memory (RAM). This means that any changes or new information must be manually saved to a file, or they will be lost once the program is turned off.
 
 \subsection{Semantic Exploration and Query Scenarios}
 The application we built makes it easy to find specific objects in the city by looking at the groups (classes) they belong to or the details (properties) they have, as illustrated in Fig.~\ref{fig:app_relations}.
@@ -177,21 +177,27 @@ For example, a user can search for all "traffic lights" or find a specific "bank
 A major part of our test was comparing two different ways the computer can "think" when searching for this information:
 
 \begin{enumerate}
-\item The SPARQL Method (Declarative): This approach utilizes a high-level, declarative query language to define the specific criteria of the data to be retrieved. Instead of providing instructions on how to access the information, the user specifies the desired semantic relationships, and the system’s query engine determines the most efficient way to extract the results from the urban ontology.
-\item The Jena API Method (Imperative): This approach relies on the imperative execution of operations via the Apache Jena library. It requires the implementation of explicit logic to programmatically traverse the ontology’s graph structure, following a specific sequence of manual instructions to identify and retrieve individuals and their associated properties.
+\item The SPARQL Method (Declarative): This approach utilises a high-level, declarative query language to define the specific criteria of the data to be retrieved. Instead of providing instructions for accessing the information, the user specifies the desired semantic relationships, and the system’s query engine determines the most efficient way to extract the results from the urban ontology.
+\item The Jena API Method (Imperative): This approach relies on the imperative execution of operations via the Apache Jena library. It requires implementing explicit logic to programmatically traverse the ontology’s graph structure, following a specific sequence of manual instructions to identify and retrieve individuals and their associated properties.
 \end{enumerate}
 During our tests, we noticed that the SPARQL method might take a few extra seconds the very first time it is used because the computer has to load all the city data into its active memory. However, once the data is loaded, this method is very fast and powerful, even when there is a huge amount of information to look through.
-The most important finding was that both methods gave the exact same results. No matter which way the computer searched for objects connected by a specific relation, the answer was always identical. This proves that our system is reliable and that both ways of searching work correctly for navigating city data.
+The most important finding was that both methods yielded identical results. No matter which way the computer searched for objects connected by a specific relation, the answer was always identical. This proves that our system is reliable and that both search methods work correctly for navigating city data.
 
 \subsection{Graph Construction and Neo4j Integration}
-To do more advanced work with finding paths, we needed to move the information from the ontology into a format better suited for maps. We took the "neighborhood relations" (which show which city objects are next to each other) and exported them into a simple CSV file. The exported data was structured into semantic triples, where each record in the CSV file consisted of three distinct components: the source individual, the relational property (such as hasDirectNeighbor), and the target individual.
-Next, we brought this data into Neo4j, which is a database designed to handle maps and networks. We used a specific language called Cypher to tell the database how to read the CSV file and create the graph. To make sure the map was accurate, we set a "uniqueness rule" (called a constraint) for the names of the objects. This ensured that each city landmark appeared only once in the system, preventing any confusing duplicates.
-The final result was a complete, digital map of that part of the city. This network, or graph, was made up of 235 nodes (representing individual city objects like buildings or street corners) and 493 edges (the lines representing the connections between them). Because many objects share the same neighbors, the system automatically linked everything together into one large, connected structure, making it possible to calculate routes from one side of the area to the other.
+To do more advanced work with finding paths, we needed to move the information from the ontology into a format better suited for maps. We took the "neighbourhood relations" (which show which city objects are adjacent) and exported them to a simple CSV file. The exported data was structured into semantic triples, where each record in the CSV file consisted of three distinct components: the source individual, the relational property (such as hasDirectNeighbor), and the target individual.
+Next, we imported this data into Neo4j, a database designed to handle graphs and networks. We used a specific language called Cypher to tell the database how to read the CSV file and create the graph. To ensure the map was accurate, we set a "uniqueness rule" (a constraint) for object names. This ensured that each city landmark appeared only once in the system, preventing any confusing duplicates.
+The final result was a complete, digital map of that part of the city. This network, or graph, consisted of 235 nodes (representing individual city objects such as buildings or street corners) and 493 edges (the lines representing the connections between them). Because many objects share the same neighbours, the system automatically linked everything together into one large, connected structure, making it possible to calculate routes from one side of the area to the other.
 
 \subsection{Pathfinding Analysis and Test Scenario}
-The graph we built in the previous step was very important because it allowed us to look for the best ways to travel between different city objects. To do this, we used a special set of tools called the Graph Data Science (GDS) library, which is a part of the Neo4j system designed specifically for analyzing connections. We wanted to see how well the system could find a path in a real-world situation.
-For our test, we chose a specific task: finding a route from the stairs at Bank Zachodni WBK to the City Hall at Skwer Niepodległości. We did not just use one method; we tested three different mathematical methods, or algorithms, called ShortestPath, Dijkstra, and Yens, to see if they would all agree on the best way to go.
-The results were very successful. Every algorithm we tried found the exact same path. This route took the user through 5 different intermediate points as shown in Fig.~\ref{fig:graph}, which were mostly segments of sidewalks and streets. What was even more impressive was the speed of the system. The computer was able to calculate the entire path in just 28 to 32 milliseconds. This experiment proves that taking detailed information from an ontology and putting it into a graph database is a very fast and effective way to handle city navigation tasks.
+The graph we built in the previous step was crucial because it enabled us to identify the best routes between places in the city.
+To do this, we used a specialised set of tools called the Graph Data Science (GDS) library, which is part of the Neo4j system and designed specifically for analysing connections. 
+The goal was to see how well the system could find a path in a real-world situation.
+For our test, we chose a specific task: finding a route from the stairs at Bank Zachodni WBK to the City Hall at Skwer Niepodległości. 
+It was very important that the found path was suitable for a blind user, so it led through as few pedestrian crossings, corners and intersections as possible.
+Instead using just one method, we tested three different algorithms namely: the ShortestPath, Dijkstra, and Yen's, to see whether they would all agree on the best route.
+The results were very successful. 
+Every algorithm we tried found the exact same path. 
+This route took the user through 5 different intermediate points as shown in Fig.~\ref{fig:graph}, which were mostly segments of sidewalks and streets. Even more impressive was the system's speed. The computer was able to calculate the entire path in just 28 to 32 milliseconds. This experiment demonstrates that extracting detailed information from an ontology and loading it into a graph database is a very fast and effective way to handle city navigation tasks.
 
 \begin{figure}[ht]
     \centering
@@ -201,20 +207,42 @@ The results were very successful. Every algorithm we tried found the exact same 
 \end{figure}
 
 \section{results}
-The experiment provided clear data and facts that prove our city navigation system works well. The digital map, called CityOntoNavi, was built with 60 different categories for things like roads and sidewalks. Inside these categories, we added 431 specific city objects, such as buildings and traffic lights. We also created 32 types of connections to link these objects together. Two very important links are hasDirectNeighbor, which shows which things are next to each other, and isLocatedOn, which tells the system exactly which street an object is on.
-We tested two different ways for the computer to search for information: the SPARQL method and the Jena API method. Our tests showed that both ways found the exact same answers, which proves the system is reliable. We also found that while the SPARQL method needs a moment to load the data at first, it is very fast at handling large amounts of city information once it starts.
-To find the best routes, we moved the city data into a system called Neo4j. This created a digital map with 235 points (nodes) and 493 connections (edges). We then asked the computer to find the shortest path between two specific places: the stairs at Bank Zachodni WBK and City Hall. Every method we used found the same route, which included 5 steps along various sidewalks and streets.
-The computer was extremely fast, finishing the calculation in only 28 to 32 milliseconds. This proves that the experiment was a success. It shows that combining a detailed digital map with a fast graph database is an excellent way to help people find their way around a city quickly and accurately.
+The experiment provided clear data and facts that prove our city navigation system works well. 
+The digital map, called CityOntoNavi, was built with 60 categories for features such as roads and sidewalks. 
+Inside these categories, we added 431 specific city objects, such as buildings and traffic lights. 
+We also created 32 types of relations to link these objects together. 
+Two crucial relations are hasDirectNeighbor, which indicates which indyviduals are adjacent, and isLocatedOn, which specifies exactly which street an object is on.
+We tested two different ways for the computer to search for information: the SPARQL method and the Jena API method. 
+Our tests showed that both approaches produced the same answers, which proves the system is reliable. 
+However we found that while the SPARQL method takes a moment to load the data initially, it is very fast at handling large amounts of city information once it starts.
+To find the best routes, we moved the city data into a graphical database which allowed the use of fast route search algorithms.
+We chose an open-source Neo4j system as the graphical database engine.
+This created a digital map with 235 points (nodes) and 493 connections (edges). 
+We then asked the computer to find the shortest path between two specific places: the stairs at Bank Zachodni WBK and City Hall. 
+Every method we used found the same route, which included 5 steps along various sidewalks and streets.
+The algorithmes were extremely fast, finishing the calculation in only 28 to 32 milliseconds. 
+This proves that the experiment was a successful.
+It shows that combining a detailed digital map with a fast graph database is an excellent way to help people find their way around a city quickly and accurately.
 
 \section{Conclusions}
-The conducted experiment confirmed the effectiveness of combining object ontologies with graph databases in modeling urban space.The study focused on developing a custom Java application to manage a digital map of Siedlce containing 431 objects, which was then integrated with a graph database to test the speed and accuracy of finding city routes. The main conclusions from the research are as follows:
-Route optimization: Routes determined by standard shortest path algorithms require further personalization for blind people. It is necessary to introduce graph edge weights that would favor continuous sections of sidewalks and the presence of landmarks (e.g., sound signals) while avoiding complex intersections.
-Technological performance: The integration of SPARQL and Neo4j allows for efficient processing of spatial relations, which constitutes a solid foundation for navigation engines in assistive systems.
-Limitations and the future: The current challenge remains the labor-intensiveness of manual ontology modeling. Future work should focus on automating data acquisition (e.g., through LiDAR or OCR) and on testing generated routes with blind users in a VR environment.
-% w tej sekcji zostawimy mniej więcej to co jest ewentualnie rozbudujemy i wyjaśnimy niektóre zdania.
+The conducted experiment confirmed the effectiveness of combining object ontologies with graph databases in modelling urban space. 
+The study focused on developing a custom Java application to manage a digital map of Siedlce containing 431 objects, which was then integrated with a graph database to test the speed and accuracy of route-finding in the city. 
+The main conclusions from the research are as follows:
+\begin{itemize}
+\item {\bf Route optimisation:} Routes generated by standard shortest-path algorithms require further personalisation for blind people. 
+It is necessary to introduce edge weights in the graph that favour continuous sections of sidewalks and the presence of landmarks (e.g., sound signals) while avoiding complex intersections.
+\item {\bf Technological performance:} The integration of SPARQL and Neo4j enables efficient processing of spatial relations, providing a solid foundation for navigation engines in assistive systems.
+\end{itemize}
 
-This method has shown great potential in building training systems that will allow people with visual impairments to safely familiarize themselves with the city's topography before going out into the field.
+{\bf Limitations and the future:} The current challenge remains the labour-intensive nature of manual ontology modelling. 
+Creating an ontology consisting of 60 classes and over 330 individuals was laborious and time-consuming.
+Adding individual points with their addresses, features and GPS coordinates to such a map is very tedious.
+For these reasons, future work should focus on automating data acquisition (e.g., through LiDAR or OCR) and on testing generated routes with blind users in a VR environment.
+Certainly, the use of robots or drones scanning space and image recognition would give a better result.
 
+Despite the problems mentioned above, the method used in our experiment, which involved transforming the ontology into a graph and then using algorithms, turned out to be promising.
+The application created as part of the work can constitute the basis or module for developing larger systems that automate the process of creating city maps dedicated to blind people and determining routes for exploration by them.
+This method has shown great potential in building training systems that will allow people with visual impairments to safely familiarise themselves with the city's topography before going out into the field.
 %\balance
 
 \section*{References}

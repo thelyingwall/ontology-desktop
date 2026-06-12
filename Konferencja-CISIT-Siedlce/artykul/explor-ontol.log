@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.10.12)  12 JUN 2026 17:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.10.12)  12 JUN 2026 20:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -529,16 +529,30 @@ File: new_relation_search.png Graphic file (type png)
 Package pdftex.def Info: new_relation_search.png  used on input line 171.
 (pdftex.def)             Requested size: 242.52063pt x 74.34947pt.
  [3 <./triple.png> <./class.png> <./app_results.png>]
-Underfull \vbox (badness 8113) has occurred while \output is active []
-
- [4 <./new_relation.png> <./app_relations.png> <./new_relation_search.png>]
-<graph.png, id=144, 1422.31375pt x 437.635pt>
+<graph.png, id=135, 1422.31375pt x 437.635pt>
 File: graph.png Graphic file (type png)
 <use graph.png>
-Package pdftex.def Info: graph.png  used on input line 198.
+Package pdftex.def Info: graph.png  used on input line 204.
 (pdftex.def)             Requested size: 242.52063pt x 74.61732pt.
+ [4 <./new_relation.png> <./app_relations.png> <./new_relation_search.png>]
+Underfull \hbox (badness 2103) in paragraph at lines 232--234
+[]\OT1/ptm/b/n/10 Route op-ti-mi-sa-tion: \OT1/ptm/m/n/10 Routes gen-er-ated by
+ stan-dard
+ []
 
-Underfull \hbox (badness 3302) in paragraph at lines 224--225
+
+Underfull \hbox (badness 10000) in paragraph at lines 234--235
+[]\OT1/ptm/b/n/10 Technological per-for-mance: \OT1/ptm/m/n/10 The in-te-gra-ti
+on of
+ []
+
+
+Underfull \hbox (badness 3780) in paragraph at lines 234--235
+\OT1/ptm/m/n/10 spa-tial re-la-tions, pro-vid-ing a solid foun-da-tion for
+ []
+
+
+Underfull \hbox (badness 3302) in paragraph at lines 252--253
 []\OT1/ptm/m/n/8 Dotwalker User Guide, []$https : / / dotwalker . prv . pl / dw
 usermanualwstep .
  []
@@ -556,31 +570,32 @@ Before submitting the final camera ready copy, remember to:
  process uses the appropriate paper size.
 
 - LAST -
-Extra skip:0.0pt
-Left:30.0pt/1.73193pt
-Right:30.0pt/1.73193pt
-Output:30.5pt
+Extra skip:9.0pt
+Left:111.0pt/1.73193pt
+Right:102.0pt/1.73193pt
+Output:111.0pt
 [6] (./explor-ontol.aux)
 Package rerunfilecheck Info: File `explor-ontol.out' has not changed.
 (rerunfilecheck)             Checksum: A4CC133871454AA6864530589C810927;1637.
  ) 
 Here is how much of TeX's memory you used:
- 10940 strings out of 478994
- 161134 string characters out of 5862206
- 486961 words of memory out of 5000000
- 28218 multiletter control sequences out of 15000+600000
- 440962 words of font info for 104 fonts, out of 8000000 for 9000
+ 10946 strings out of 478994
+ 161200 string characters out of 5862206
+ 483965 words of memory out of 5000000
+ 28223 multiletter control sequences out of 15000+600000
+ 443123 words of font info for 110 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,11n,74p,1275b,461s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,11n,74p,1271b,458s stack positions out of 5000i,500n,10000p,200000b,80000s
 {d:/Instalki/texlive/2021/texmf-dist/fonts/enc/dvips/base/8r.enc}<d:/Instalki
-/texlive/2021/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><d:/Instalki/texlive/
-2021/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><d:/Instalki/texlive/2021/tex
-mf-dist/fonts/type1/urw/times/utmr8a.pfb><d:/Instalki/texlive/2021/texmf-dist/f
-onts/type1/urw/times/utmri8a.pfb>
-Output written on explor-ontol.pdf (6 pages, 514853 bytes).
+/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb><d:/Instalki/
+texlive/2021/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><d:/Instalki/texlive/2
+021/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb><d:/Instalki/texlive/2021/texm
+f-dist/fonts/type1/urw/times/utmr8a.pfb><d:/Instalki/texlive/2021/texmf-dist/fo
+nts/type1/urw/times/utmri8a.pfb>
+Output written on explor-ontol.pdf (6 pages, 522350 bytes).
 PDF statistics:
- 190 PDF objects out of 1000 (max. 8388607)
- 164 compressed objects within 2 object streams
+ 194 PDF objects out of 1000 (max. 8388607)
+ 167 compressed objects within 2 object streams
  53 named destinations out of 1000 (max. 500000)
  116 words of extra memory for PDF output out of 10000 (max. 10000000)
 
