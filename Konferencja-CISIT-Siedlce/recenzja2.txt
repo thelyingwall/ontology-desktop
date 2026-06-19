@@ -1,0 +1,39 @@
+
+----------------------- REVIEW 2 ---------------------
+
+SUBMISSION: 17
+TITLE: Modeling a City Space To Support Orientation Skils Of the Blind Users With a Dedicated Ontology And a Neighborhood Graph
+AUTHORS: Alicja Rojek and Dariusz Mikułowski
+
+PC MEMBER: Piotr Świtalski
+REVIEWER: Mariusz Wzorek
+----------- Overall evaluation -----------
+SCORE: 1 (weak accept)
+----- TEXT:
+The paper addresses a relevant application area and presents a complete implementation combining an ontology, an ontology exploration tool, and a graph-based navigation framework. I think the work is a useful proof of concept and demonstrates the technical feasibility of the proposed approach. The integration of semantic technologies and graph databases for modeling urban space from a blind and visually impaired (BVI) perspective is interesting and potentially useful.
+
+One thing I found somewhat unclear is what the main contribution of the paper actually is. At different points, the paper appears to emphasize the ontology itself, the ontology exploration application, and the graph-based navigation framework. A clearer statement of the primary contribution would help the reader better understand the novelty and significance of the work.
+
+The pathfinding experiments work well as a proof of concept, showing that the ontology can be transformed into a graph representation and used for route generation. However, the current evaluation mainly demonstrates technical feasibility rather than the practical benefits of the proposed ontology model or its effectiveness for supporting navigation and orientation tasks of visually impaired users. The paper does not include user studies, expert evaluations, comparisons with alternative approaches, or route quality assessments.
+
+The reported pathfinding times (28–32 ms) are difficult to interpret because the experimental setup is not described in sufficient detail. Hardware specifications, software versions, and statistical analysis are not provided, and the reported experiment appears to be based on a single source-destination query. In addition, since the graph appears to be unweighted, it is not surprising that ShortestPath, Dijkstra, and Yen’s algorithm return the same route. Thus, the current results should primarily be interpreted as a validation of the ontology-to-graph workflow rather than of the generated routes themselves. The authors already acknowledge that weighted and personalized routing remains future work.
+
+Overall, I view the work primarily as an engineering integration of existing technologies rather than a fundamentally new method. This is not necessarily a weakness for a conference paper, but the paper would benefit from a stronger evaluation.
+
+The manuscript would also benefit from careful proofreading and terminology review. For example, the standard term “graph database” is sometimes replaced by “graphical database”. Several similar language issues occur throughout the paper and somewhat affect readability.
+
+Small language, grammar, and presentation issues:
+
+- Fig. 1 and Fig. 7 may be difficult to read when printed in two-column format. Consider increasing their size or spanning both columns.
+- “supporting independent movement...” – capitalization and punctuation issue.
+- “...and speakers, can communicate...” – grammatical issue.
+- "...inform them about them...” – awkward phrasing.
+- “airport stations” -> “airports” or “airport terminals”.
+- “his or her” -> “the user’s”.
+- “This set of technologies became proposed…” -> “was proposed”.
+- “...presented in the book Programming the Semantic Web. [18]” – citation placement/punctuation should be revised.
+- “The algorithmes...” -> “The algorithms…”.
+- “the experiment was a successful.” -> “the experiment was successful.”
+----------- Reviewer's confidence -----------
+SCORE: 4 ((high))
+__________________________________________________
