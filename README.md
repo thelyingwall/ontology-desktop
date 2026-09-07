@@ -10,7 +10,6 @@ Projekt został opracowany w ramach pracy dyplomowej dotyczącej wykorzystania o
 * **Java Swing** – interfejs graficzny
 * **Apache Jena 4.10.0** – obsługa RDF/OWL i SPARQL
 * **Maven** – zarządzanie projektem i zależnościami
-* **Lombok**
 
 ## Funkcjonalności
 
@@ -22,7 +21,6 @@ Aplikacja umożliwia:
 * wyszukiwanie relacji między elementami ontologii,
 * dodawanie, edycję i usuwanie instancji,
 * dodawanie relacji między instancjami,
-* obsługę współrzędnych GPS,
 * eksport wyników do CSV,
 * pomiar czasu wykonywania zapytań.
 
