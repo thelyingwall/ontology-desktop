@@ -4,6 +4,10 @@ Aplikacja desktopowa w języku **Java 21** służąca do pracy z ontologią RDF 
 
 Projekt został opracowany w ramach pracy dyplomowej dotyczącej wykorzystania ontologii i języków zapytań semantycznych do wspierania nauki orientacji przestrzennej osób niewidomych.
 
+## Dokumentacja
+
+Javadoc API dostępny jest online: https://thelyingwall.github.io/ontology-desktop/
+
 ## Technologie
 
 * **Java 21**
