@@ -11,15 +11,30 @@ import java.util.Map;
 
 import static org.ontology.constants.PropertyKeys.*;
 
+/**
+ * Wyświetla, edytuje lub tworzy indywidua ontologii w modalnym oknie dialogowym.
+ */
 public class DetailsDialog extends JDialog {
 
     private boolean saved = false;
 
+    /**
+     * Informuje, czy formularz zakończył się pomyślnym zapisem.
+     *
+     * @return {@code true}, gdy dane zostały zapisane
+     */
     public boolean isSaved() {
         return saved;
     }
 
-
+    /**
+     * Tworzy dialog szczegółów lub edycji istniejącego indywiduum.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis obsługujący ontologię
+     * @param rekord nazwa wybranego indywiduum
+     * @param isView {@code true}, aby wyświetlić dane, lub {@code false}, aby je edytować
+     */
     public DetailsDialog(Frame owner, AppService appService, String rekord, Boolean isView) {
         super(owner, isView ? I18n.t("button.details") : I18n.t("button.editing"), true);
         if (isView)
@@ -27,7 +42,13 @@ public class DetailsDialog extends JDialog {
         else this.edit(owner, appService, rekord);
     }
 
-    //szczegoly
+    /**
+     * Buduje widok właściwości indywiduum w polach tylko do odczytu.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis odczytujący dane ontologii
+     * @param rekord nazwa wyświetlanego indywiduum
+     */
     public void details(Frame owner, AppService appService, String rekord) {
         Map<String, String> properties = appService.getPropertiesOfInstance(rekord);
 
@@ -89,7 +110,13 @@ public class DetailsDialog extends JDialog {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-//    edycja
+    /**
+     * Buduje formularz pozwalający zmienić właściwości istniejącego indywiduum.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis aktualizujący dane ontologii
+     * @param rekord nazwa edytowanego indywiduum
+     */
     public void edit(Frame owner, AppService appService, String rekord) {
         Map<String, String> properties = appService.getPropertiesOfInstance(rekord);
         Map<String, JTextField> fields = new LinkedHashMap<>();
@@ -173,7 +200,13 @@ public class DetailsDialog extends JDialog {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    //nowe indywiduum
+    /**
+     * Tworzy formularz dodawania nowego indywiduum do wybranej klasy.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis zapisujący dane ontologii
+     * @param className nazwa klasy tworzonego indywiduum
+     */
     public DetailsDialog(Frame owner, AppService appService, String className) {
         super(owner, I18n.t("newInstance"), true);
         boolean noLocalization = appService.noLocalization(className);

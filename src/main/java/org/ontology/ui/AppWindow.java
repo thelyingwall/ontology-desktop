@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Locale;
 import javax.swing.table.TableColumn;
 
+/**
+ * Główne okno aplikacji, umożliwiające wybór klas i zarządzanie ich indywiduami.
+ */
 public class AppWindow extends JFrame{
 
     private JComboBox<String> comboBox;
@@ -26,6 +29,11 @@ public class AppWindow extends JFrame{
 
     private final AppService appService;
 
+    /**
+     * Tworzy główne okno aplikacji i inicjalizuje jego komponenty.
+     *
+     * @param appService serwis obsługujący model ontologii
+     */
     public AppWindow(AppService appService) {
         super("Ontology Desktop App");
         this.appService = appService;
@@ -38,6 +46,9 @@ public class AppWindow extends JFrame{
         setVisible(true);
     }
 
+    /**
+     * Składa główny układ okna, menu i obsługę zdarzeń.
+     */
     private void initComponents() {
         JPanel root = new JPanel(new BorderLayout());
         root.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
@@ -55,6 +66,9 @@ public class AppWindow extends JFrame{
         setupMenuShortcuts();
     }
 
+    /**
+     * Tworzy pasek menu z operacjami plikowymi, wyszukiwaniem oraz wyborem języka.
+     */
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -172,6 +186,11 @@ public class AppWindow extends JFrame{
         setJMenuBar(menuBar);
     }
 
+    /**
+     * Tworzy panel wyboru klasy oraz przyciski ładowania i dodawania indywiduów.
+     *
+     * @return skonfigurowany panel formularza
+     */
     private JPanel createFormPanel() {
         JPanel form = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -219,6 +238,11 @@ public class AppWindow extends JFrame{
         return form;
     }
 
+    /**
+     * Tworzy panel tabeli wyświetlającej indywidua wybranej klasy.
+     *
+     * @return skonfigurowany panel wyników
+     */
     private JPanel createResultsPanel() {
         resultsInfoLabel = new JLabel();
         resultsInfoLabel.setBorder(
@@ -233,6 +257,13 @@ public class AppWindow extends JFrame{
                         I18n.t("results.edit"),
                         I18n.t("results.delete")}, 0
         ) {
+            /**
+             * Pozwala edytować wyłącznie kolumny zawierające przyciski akcji.
+             *
+             * @param row indeks wiersza
+             * @param column indeks kolumny
+             * @return {@code true} dla kolumn akcji
+             */
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column >= 2;
@@ -255,6 +286,11 @@ public class AppWindow extends JFrame{
         return resultsPanel;
     }
 
+    /**
+     * Ustawia rozmiary kolumn oraz renderery i edytory przycisków tabeli.
+     *
+     * @param table tabela wyników do skonfigurowania
+     */
     private void configureTable(JTable table) {
         table.setRowHeight(25);
         table.getTableHeader().setReorderingAllowed(false);
@@ -272,14 +308,23 @@ public class AppWindow extends JFrame{
         }
     }
 
+    /**
+     * Podłącza obsługę przycisku ładującego indywidua wybranej klasy.
+     */
     private void attachLoadButtonListener() {
         loadButton.addActionListener(e -> loadInstances());
     }
 
+    /**
+     * Podłącza obsługę przycisku otwierającego formularz nowego indywiduum.
+     */
     private void attachAddButtonListener() {
         addButton.addActionListener(e -> addInstance());
     }
 
+    /**
+     * Pobiera indywidua wybranej klasy i odświeża tabelę wyników.
+     */
     public void loadInstances() {
         String selectedClass = comboBox.getSelectedItem().toString();
         List<String> instances = appService.getInstancesOfClass(selectedClass);
@@ -306,6 +351,9 @@ public class AppWindow extends JFrame{
         }
     }
 
+    /**
+     * Otwiera formularz tworzenia indywiduum, jeśli wybrana klasa nie jest abstrakcyjna.
+     */
     private void addInstance() {
         String selectedClass = comboBox.getSelectedItem().toString();
         boolean newInstancesDisabled = appService.isAbstractClass(selectedClass);
@@ -325,26 +373,41 @@ public class AppWindow extends JFrame{
         }
     }
 
+    /**
+     * Otwiera dialog dodawania relacji między indywiduami.
+     */
     private void addRelation() {
         AddRelationDialog dialog = new AddRelationDialog(this, appService);
         dialog.setVisible(true);
     }
 
+    /**
+     * Otwiera dialog wyszukiwania indywiduów po właściwości.
+     */
     private void find() {
         FindDialog dialog = new FindDialog(this, appService);
         dialog.setVisible(true);
     }
 
+    /**
+     * Otwiera dialog wyszukiwania relacji wskazanego indywiduum.
+     */
     private void findRelations() {
         FindDialog dialog = new FindDialog(this, appService, true, false);
         dialog.setVisible(true);
     }
 
+    /**
+     * Otwiera dialog wyszukiwania relacji powiązanych z wybraną klasą.
+     */
     private void findRelationsByClass() {
         FindDialog dialog = new FindDialog(this, appService, true, true);
         dialog.setVisible(true);
     }
 
+    /**
+     * Rejestruje skróty klawiaturowe dla menu oraz listy wyboru klasy.
+     */
     private void setupMenuShortcuts() {
         JRootPane rootPane = getRootPane();
 
@@ -352,6 +415,11 @@ public class AppWindow extends JFrame{
         KeyStroke openMenuKey = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, InputEvent.CTRL_DOWN_MASK);
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(openMenuKey, "openMenu");
         rootPane.getActionMap().put("openMenu", new AbstractAction() {
+            /**
+             * Otwiera pierwsze menu i przekazuje fokus jego pierwszej pozycji.
+             *
+             * @param e zdarzenie wywołujące akcję
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 JMenu fileMenu = getJMenuBar().getMenu(0);
@@ -364,6 +432,11 @@ public class AppWindow extends JFrame{
         KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKey, "selectClassList");
         rootPane.getActionMap().put("selectClassList", new AbstractAction() {
+            /**
+             * Zamyka rozwinięte menu i przekazuje fokus liście klas.
+             *
+             * @param e zdarzenie wywołujące akcję
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -372,6 +445,9 @@ public class AppWindow extends JFrame{
         });
     }
 
+    /**
+     * Buduje ponownie interfejs po zmianie języka i odświeża komponenty Swing.
+     */
     private void refreshUI() {
         getContentPane().removeAll();
         getJMenuBar().removeAll();

@@ -8,6 +8,9 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.text.MessageFormat;
 
+/**
+ * Edytor komórek tabeli, który obsługuje przyciski szczegółów, edycji i usuwania indywiduum.
+ */
 class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
 
     private final JButton button = new JButton();
@@ -17,6 +20,14 @@ class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
     private final JTable table;
     private final int column;
 
+    /**
+     * Tworzy edytor przycisku dla wskazanej kolumny tabeli wyników.
+     *
+     * @param owner okno będące właścicielem dialogów
+     * @param appService serwis wykonujący operacje na ontologii
+     * @param table tabela, dla której tworzony jest edytor
+     * @param column indeks kolumny obsługiwanej przez przycisk
+     */
     public ActionButtonEditor(
             JFrame owner,
             AppService appService,
@@ -60,6 +71,16 @@ class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
         });
     }
 
+    /**
+     * Przygotowuje przycisk do edycji bieżącej komórki i zapamiętuje nazwę wybranego indywiduum.
+     *
+     * @param table tabela zawierająca komórkę
+     * @param value tekst wyświetlany na przycisku
+     * @param isSelected czy wiersz jest zaznaczony
+     * @param row indeks edytowanego wiersza
+     * @param column indeks edytowanej kolumny
+     * @return przycisk używany jako edytor komórki
+     */
     @Override
     public Component getTableCellEditorComponent(
             JTable table, Object value,
@@ -70,6 +91,11 @@ class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
         return button;
     }
 
+    /**
+     * Zwraca tekst aktualnie wyświetlany na przycisku.
+     *
+     * @return wartość edytowanej komórki
+     */
     @Override
     public Object getCellEditorValue() {
         return button.getText();

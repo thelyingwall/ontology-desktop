@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Udostępnia formularze wyszukiwania indywiduów oraz relacji w ontologii.
+ */
 public class FindDialog extends JDialog {
 
     private JComboBox<String> combo1;
@@ -27,6 +30,12 @@ public class FindDialog extends JDialog {
     private List<IndividualsByRelations> results;
     private JLabel executionTimeLabel;
 
+    /**
+     * Tworzy dialog wyszukiwania indywiduów po klasie i wartości właściwości.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis wykonujący wyszukiwanie
+     */
     public FindDialog(Frame owner, AppService appService) {
         super(owner, I18n.t("menu.search"), true);
         setupMenuShortcuts();
@@ -101,6 +110,13 @@ public class FindDialog extends JDialog {
                         I18n.t("results.lp"),
                         I18n.t("results.label"),
                         }, 0) {
+                    /**
+                     * Blokuje edycję wyników wyszukiwania indywiduów.
+                     *
+                     * @param row indeks wiersza
+                     * @param column indeks kolumny
+                     * @return zawsze {@code false}
+                     */
                     @Override
                     public boolean isCellEditable(int row, int column) {
                         return false;
@@ -155,6 +171,14 @@ public class FindDialog extends JDialog {
         cancelButton.addActionListener(e -> dispose());
     }
 
+    /**
+     * Tworzy dialog wyszukiwania relacji dla indywiduum albo dla klasy.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis wykonujący wyszukiwanie
+     * @param searchRelations flaga zachowana dla zgodności z miejscami wywołania dialogu
+     * @param searchByClass {@code true}, aby wyszukiwać dla klasy, lub {@code false}, aby wyszukiwać dla indywiduum
+     */
     public FindDialog(Frame owner, AppService appService, boolean searchRelations, boolean searchByClass) {
         super(owner, I18n.t("menu.search"), true);
         setupMenuShortcuts();
@@ -227,6 +251,13 @@ public class FindDialog extends JDialog {
                         I18n.t("sourceIndividual"),
                         I18n.t("relationName"),
                         I18n.t("matchedIndividual")}, 0) {
+                    /**
+                     * Blokuje edycję wyników wyszukiwania relacji.
+                     *
+                     * @param row indeks wiersza
+                     * @param column indeks kolumny
+                     * @return zawsze {@code false}
+                     */
                     @Override
                     public boolean isCellEditable(int row, int column) {
                         return false;
@@ -334,10 +365,21 @@ public class FindDialog extends JDialog {
         cancelButton.addActionListener(e -> dispose());
     }
 
+    /**
+     * Konfiguruje tabelę wyników wyszukiwania indywiduów.
+     *
+     * @param table tabela do skonfigurowania
+     */
     private void configureTable(JTable table) {
         configureTable(table, false);
     }
 
+    /**
+     * Konfiguruje rozmiary kolumn tabeli wyników.
+     *
+     * @param table tabela do skonfigurowania
+     * @param relations czy tabela przedstawia relacje zamiast samych indywiduów
+     */
     private void configureTable(JTable table, boolean relations) {
         table.setRowHeight(25);
         table.getTableHeader().setReorderingAllowed(false);
@@ -358,6 +400,11 @@ public class FindDialog extends JDialog {
         }
     }
 
+    /**
+     * Czyści tabelę i wyświetla przekazane relacje albo komunikat o braku wyników.
+     *
+     * @param results relacje do pokazania
+     */
     private void displayResults(List<IndividualsByRelations> results) {
         tableModel.setRowCount(0);
 
@@ -381,8 +428,9 @@ public class FindDialog extends JDialog {
             });
         }
     }
-
-
+    /**
+     * Rejestruje skrót Escape, który zamyka rozwinięte menu i ustawia fokus na liście wyboru.
+     */
     private void setupMenuShortcuts() {
         JRootPane rootPane = getRootPane();
 
@@ -390,6 +438,11 @@ public class FindDialog extends JDialog {
         KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKey, "selectClassList");
         rootPane.getActionMap().put("selectClassList", new AbstractAction() {
+            /**
+             * Zamyka aktywne menu i przywraca fokus do listy wyboru.
+             *
+             * @param e zdarzenie wywołujące akcję
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 MenuSelectionManager.defaultManager().clearSelectedPath();

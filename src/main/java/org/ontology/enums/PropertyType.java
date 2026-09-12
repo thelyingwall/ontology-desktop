@@ -1,5 +1,8 @@
 package org.ontology.enums;
 
+/**
+ * Definiuje właściwości danych oraz relacje, po których można wyszukiwać indywidua.
+ */
 public enum PropertyType {
     type,
     NamedIndividual,

@@ -1,5 +1,8 @@
 package org.ontology.enums;
 
+/**
+ * Definiuje klasy dostępne w obsługiwanej ontologii miejskiej.
+ */
 public enum Classes {
     Address,
     AdvertisingColumn,

@@ -19,6 +19,9 @@ import java.util.regex.Pattern;
 import static org.ontology.constants.PropertyKeys.NAMED_INDIVIDUAL;
 import static org.ontology.constants.PropertyKeys.TYPE;
 
+/**
+ * Zarządza modelem RDF ontologii oraz wykonuje operacje odczytu, zapisu i wyszukiwania danych.
+ */
 public class AppService {
 
     private final Model model;
@@ -29,6 +32,11 @@ public class AppService {
     private final String prefixOWL = "PREFIX owl:  <http://www.w3.org/2002/07/owl#>";
     private static final Pattern COORD_PATTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
+    /**
+     * Wczytuje ontologię RDF z podanej ścieżki do modelu Jena.
+     *
+     * @param ontologyPath ścieżka do pliku ontologii
+     */
     public AppService(String ontologyPath) {
         model = ModelFactory.createDefaultModel();
 
@@ -42,6 +50,9 @@ public class AppService {
         }
     }
 
+    /**
+     * Wykonuje przykładowe zapytanie SPARQL i wypisuje pierwsze dziesięć trójek modelu.
+     */
     public void ontologyQueryExample() {
         String queryStr = """
                 SELECT ?s ?p ?o 
@@ -56,6 +67,11 @@ public class AppService {
         }
     }
 
+    /**
+     * Pobiera nazwy wszystkich klas zdefiniowanych w ontologii.
+     *
+     * @return posortowana lista lokalnych nazw klas
+     */
     public List<String> getClasses() {
         String queryStr = prefixRDF + prefixOWL + """
                 SELECT ?class
@@ -90,6 +106,12 @@ public class AppService {
         return classNames;
     }
 
+    /**
+     * Wyszukuje indywidua należące do wskazanej klasy.
+     *
+     * @param selectedClass lokalna nazwa klasy
+     * @return lista lokalnych nazw jej indywiduów
+     */
     public List<String> getInstancesOfClass(String selectedClass) {
         List<String> instances = new ArrayList<>();
         String classUri = baseUri + "#" + selectedClass;
@@ -117,6 +139,11 @@ public class AppService {
         return instances;
     }
 
+    /**
+     * Pobiera nazwy wszystkich indywiduów oznaczonych jako {@code owl:NamedIndividual}.
+     *
+     * @return lista nazw indywiduów
+     */
     public List<String> getAllInstances() {
         List<String> instances = new ArrayList<>();
 
@@ -156,6 +183,12 @@ public class AppService {
     }
 
 
+    /**
+     * Odczytuje zapisane współrzędne GPS indywiduum.
+     *
+     * @param instanceName lokalna nazwa indywiduum
+     * @return współrzędne GPS albo {@code null}, gdy nie zostały określone
+     */
     public String getGpsCoordinatesOfInstance(String instanceName) {
         String instanceUri = baseUri + "#" + instanceName;
 
@@ -179,6 +212,12 @@ public class AppService {
         return null;
     }
 
+    /**
+     * Pobiera właściwości danych wskazanego indywiduum.
+     *
+     * @param instanceName lokalna nazwa indywiduum
+     * @return uporządkowana mapa nazw właściwości i ich wartości
+     */
     public Map<String, String> getPropertiesOfInstance(String instanceName) {
 
         String queryStr = prefixRDF + prefixBase + """
@@ -208,6 +247,12 @@ public class AppService {
         return result;
     }
 
+    /**
+     * Tworzy w modelu nowe indywiduum wraz z przekazanymi właściwościami.
+     *
+     * @param properties mapa właściwości, zawierająca co najmniej nazwę i typ indywiduum
+     * @return {@code true}, gdy zapis do modelu się powiódł
+     */
     public Boolean saveInstance(Map<String, String> properties) {
         try {
             String NS = baseUri + "#";
@@ -241,6 +286,12 @@ public class AppService {
         }
     }
 
+    /**
+     * Zastępuje właściwości istniejącego indywiduum przekazanymi wartościami.
+     *
+     * @param instanceName lokalna nazwa aktualizowanego indywiduum
+     * @param properties nowe wartości właściwości
+     */
     public void updateInstance(String instanceName, Map<String, String> properties) {
         String NS = baseUri + "#";
 
@@ -275,10 +326,15 @@ public class AppService {
                 }
             }
         }
-        //todo poprawic
     }
 
 
+    /**
+     * Zmienia pierwszy znak tekstu na małą literę; całe skróty zapisane wielkimi literami zmienia na małe.
+     *
+     * @param str tekst do przekształcenia
+     * @return tekst rozpoczynający się małą literą albo pierwotna wartość dla pustego tekstu
+     */
     public static String decapitalize(String str) {
         if (str == null || str.isEmpty()) return str;
 
@@ -289,6 +345,12 @@ public class AppService {
         return Character.toLowerCase(str.charAt(0)) + str.substring(1);
     }
 
+    /**
+     * Zapisuje bieżący model RDF do pliku w formacie RDF/XML.
+     *
+     * @param file plik docelowy
+     * @return {@code true}, gdy plik został zapisany
+     */
     public boolean saveFile(File file) {
         try (FileOutputStream out = new FileOutputStream(file)) {
             model.write(out, "RDF/XML-ABBREV");
@@ -299,6 +361,12 @@ public class AppService {
         }
     }
 
+    /**
+     * Wczytuje model RDF z pliku, zastępując aktualnie załadowane dane.
+     *
+     * @param file plik źródłowy ontologii
+     * @return {@code true}, gdy plik został poprawnie odczytany
+     */
     public boolean loadFile(File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             model.removeAll();
@@ -310,6 +378,12 @@ public class AppService {
         }
     }
 
+    /**
+     * Sprawdza, czy dla klasy nie należy wymagać lokalizacji GPS przy tworzeniu indywiduum.
+     *
+     * @param selectedClass lokalna nazwa klasy
+     * @return {@code true}, gdy klasa nie wymaga lokalizacji
+     */
     public boolean noLocalization(String selectedClass) {
         List<String> abstractClasses = List.of(
                 Classes.Bike.toString(),
@@ -325,6 +399,12 @@ public class AppService {
         return abstractClasses.contains(selectedClass);
     }
 
+    /**
+     * Sprawdza, czy klasa jest abstrakcyjna i nie może mieć bezpośrednich instancji w interfejsie.
+     *
+     * @param selectedClass lokalna nazwa klasy
+     * @return {@code true}, gdy klasa jest abstrakcyjna
+     */
     public boolean isAbstractClass(String selectedClass) {
         List<String> abstractClasses = List.of(
                 Classes.Bike.toString(),
@@ -339,6 +419,11 @@ public class AppService {
         return abstractClasses.contains(selectedClass);
     }
 
+    /**
+     * Usuwa indywiduum oraz wszystkie trójki, w których występuje jako podmiot lub obiekt.
+     *
+     * @param instance lokalna nazwa usuwanego indywiduum
+     */
     public void deleteInstance(String instance) {
         String uri = baseUri + "#" + instance;
         Resource individual = model.getResource(uri);
@@ -349,9 +434,14 @@ public class AppService {
         } else {
             System.out.println(MessageFormat.format(I18n.t("messageBox.individualNotFoundError"), uri));
         }
-        // todo dodac usuwanie relacji
     }
 
+    /**
+     * Waliduje zapis szerokości geograficznej w dopuszczalnym zakresie od -90 do 90 stopni.
+     *
+     * @param value tekstowa wartość szerokości
+     * @return {@code true}, gdy wartość ma poprawny format i zakres
+     */
     public boolean isValidLatitude(String value) {
         if (!COORD_PATTERN.matcher(value).matches()) {
             return false;
@@ -361,6 +451,12 @@ public class AppService {
         return lat >= -90 && lat <= 90;
     }
 
+    /**
+     * Waliduje zapis długości geograficznej w dopuszczalnym zakresie od -180 do 180 stopni.
+     *
+     * @param value tekstowa wartość długości
+     * @return {@code true}, gdy wartość ma poprawny format i zakres
+     */
     public boolean isValidLongitude(String value) {
         if (!COORD_PATTERN.matcher(value).matches()) {
             return false;
@@ -370,6 +466,14 @@ public class AppService {
         return lon >= -180 && lon <= 180;
     }
 
+    /**
+     * Dodaje do modelu relację RDF pomiędzy dwoma indywiduami.
+     *
+     * @param selectedIndividual1 nazwa indywiduum źródłowego
+     * @param selectedRelationType nazwa predykatu relacji
+     * @param selectedIndividual2 nazwa indywiduum docelowego
+     * @return {@code true}, gdy relacja została dodana
+     */
     public boolean addNewRelation(String selectedIndividual1, String selectedRelationType, String selectedIndividual2) {
         try {
             String NS = baseUri + "#";
@@ -397,6 +501,14 @@ public class AppService {
         }
     }
 
+    /**
+     * Wyszukuje indywidua danej klasy, których właściwość zawiera wskazany tekst.
+     *
+     * @param selectedClass nazwa przeszukiwanej klasy
+     * @param selectedProperty nazwa porównywanej właściwości
+     * @param selectedValue fragment szukanej wartości
+     * @return lista pasujących indywiduów
+     */
     public List<String> findIndividualsByClassAndProperty(String selectedClass, String selectedProperty, String selectedValue) {
         List<String> instances = new ArrayList<>();
         String classUri = baseUri + "#" + selectedClass;
@@ -433,6 +545,13 @@ public class AppService {
         return instances;
     }
 
+    /**
+     * Wyszukuje relacje przychodzące i wychodzące dla indywiduum, używając SPARQL.
+     *
+     * @param selectedIndividual nazwa analizowanego indywiduum
+     * @param selectedRelation nazwa relacji
+     * @return relacje oraz czas wykonania zapytania
+     */
     public SearchedIndividualsRelations findIndividualsByRelationSPARQL(String selectedIndividual, String selectedRelation) {
         List<IndividualsByRelations> results = new ArrayList<>();
         String individualUri = baseUri + "#" + selectedIndividual;
@@ -483,6 +602,13 @@ public class AppService {
         return new SearchedIndividualsRelations(results, String.format("%.3f ms", durationMs));
     }
 
+    /**
+     * Wyszukuje relacje przychodzące i wychodzące dla indywiduum przez bezpośrednie przeszukanie modelu Jena.
+     *
+     * @param selectedIndividual nazwa analizowanego indywiduum
+     * @param selectedRelation nazwa relacji
+     * @return relacje oraz czas wykonania operacji
+     */
     public SearchedIndividualsRelations findIndividualsByRelation(
             String selectedIndividual,
             String selectedRelation) {
@@ -543,6 +669,13 @@ public class AppService {
         return new SearchedIndividualsRelations(results, String.format("%.3f ms", durationMs));
     }
 
+    /**
+     * Wyszukuje relacje, w których przynajmniej jedno indywiduum jest wskazanej klasy, używając SPARQL.
+     *
+     * @param selectedClass nazwa analizowanej klasy
+     * @param selectedRelation nazwa relacji
+     * @return znalezione relacje oraz czas wykonania zapytania
+     */
     public SearchedIndividualsRelations findRelationsByClassSPARQL(
             String selectedClass, String selectedRelation) {
 
@@ -597,6 +730,13 @@ public class AppService {
                 String.format("%.3f ms", durationMs));
     }
 
+    /**
+     * Wyszukuje relacje, w których przynajmniej jedno indywiduum jest wskazanej klasy, przez model Jena.
+     *
+     * @param selectedClass nazwa analizowanej klasy
+     * @param selectedRelation nazwa relacji
+     * @return znalezione relacje oraz czas wykonania operacji
+     */
     public SearchedIndividualsRelations findRelationsByClass(
             String selectedClass, String selectedRelation) {
 
@@ -654,6 +794,13 @@ public class AppService {
         );
     }
 
+    /**
+     * Eksportuje znalezione relacje do pliku CSV w kodowaniu UTF-8.
+     *
+     * @param results relacje przeznaczone do eksportu
+     * @param file plik docelowy; rozszerzenie {@code .csv} zostanie dodane automatycznie
+     * @return {@code true}, gdy eksport się powiódł
+     */
     public boolean exportCSV(List<IndividualsByRelations> results, File file) {
         if (results == null || results.isEmpty()) {
             return false;
@@ -691,6 +838,12 @@ public class AppService {
         }
     }
 
+    /**
+     * Formatuje pojedynczą wartość zgodnie z zasadami CSV.
+     *
+     * @param field wartość do zapisania
+     * @return wartość z poprawnie obsłużonymi znakami specjalnymi
+     */
     private String escapeCsv(String field) {
         if (field == null) return "";
         if (field.contains(",") || field.contains("\"") || field.contains("\n")) {

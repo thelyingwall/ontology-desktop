@@ -9,15 +9,28 @@ import java.awt.*;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
+/**
+ * Modalne okno dialogowe służące do utworzenia relacji pomiędzy dwoma indywiduami.
+ */
 public class AddRelationDialog extends JDialog {
 
     private boolean saved = false;
 
+    /**
+     * Informuje, czy użytkownik zapisał nową relację.
+     *
+     * @return {@code true}, gdy relacja została zapisana
+     */
     public boolean isSaved() {
         return saved;
     }
 
-    //nowa relacja
+    /**
+     * Tworzy i konfiguruje formularz dodawania relacji.
+     *
+     * @param owner okno będące właścicielem dialogu
+     * @param appService serwis obsługujący model ontologii
+     */
     public AddRelationDialog(Frame owner, AppService appService) {
         super(owner, I18n.t("newRelation"), true);
 

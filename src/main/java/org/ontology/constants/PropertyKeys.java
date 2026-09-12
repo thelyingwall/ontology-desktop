@@ -1,5 +1,8 @@
 package org.ontology.constants;
 
+/**
+ * Zawiera nazwy właściwości i relacji używanych w modelu ontologii.
+ */
 public class PropertyKeys {
     public static final String TYPE = "type";
     public static final String NAMED_INDIVIDUAL = "NamedIndividual";
