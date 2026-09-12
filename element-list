@@ -1,0 +1,6 @@
+org.ontology
+org.ontology.constants
+org.ontology.enums
+org.ontology.models
+org.ontology.service
+org.ontology.ui
